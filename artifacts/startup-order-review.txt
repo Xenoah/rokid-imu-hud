@@ -1,0 +1,5 @@
+PASS: Old bytecode calls Window.getInsetsController before setContentView.
+PASS: New bytecode installs content before hiding system bars.
+PASS: New bytecode creates/obtains decor, uses View API, and checks null before hide.
+PASS: New bytecode has no direct Window.getInsetsController call.
+Scope: bytecode inspection against AOSP Android 12 source; not Android runtime execution.

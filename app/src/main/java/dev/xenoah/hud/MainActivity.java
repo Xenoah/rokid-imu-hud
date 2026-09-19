@@ -41,15 +41,30 @@ public final class MainActivity extends Activity {
     };
     @Override public void onCreate(Bundle state){
         super.onCreate(state);
+        Log.i(Diagnostics.TAG,"startup: onCreate");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().setDecorFitsSystemWindows(false);
-        WindowInsetsController bars=getWindow().getInsetsController();
-        if(bars!=null){bars.hide(WindowInsets.Type.systemBars());bars.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);}
         boolean debug=getIntent().getBooleanExtra("debug",false);
         Exchange exchange=new Exchange();
         sensors=new SensorController(this,exchange,getIntent().getBooleanExtra("force_fusion",false));
         surface=new HudSurface(this,exchange,debug);setContentView(surface);
         diagnostics=new Diagnostics(this,exchange,debug);
+        // PhoneWindow.getInsetsController() dereferences mDecor on Android 12.
+        // Install content first; use the View API, which can safely return null
+        // before attachment. Retry when the window receives focus.
+        hideSystemBars();
+        Log.i(Diagnostics.TAG,"startup: content ready");
+    }
+    private void hideSystemBars(){
+        WindowInsetsController bars=getWindow().getDecorView().getWindowInsetsController();
+        if(bars!=null){
+            bars.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            bars.hide(WindowInsets.Type.systemBars());
+        }
+    }
+    @Override public void onWindowFocusChanged(boolean hasFocus){
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus)hideSystemBars();
     }
     @Override protected void onResume(){
         super.onResume();foreground=true;
@@ -58,6 +73,7 @@ public final class MainActivity extends Activity {
         if(Build.VERSION.SDK_INT>=33)registerReceiver(receiver,filter,Context.RECEIVER_EXPORTED);
         else registerReceiver(receiver,filter);
         registered=true;updateRunning();
+        Log.i(Diagnostics.TAG,"startup: resumed");
     }
     private void updateRunning(){
         if(foreground&&worn&&open){getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);sensors.start();surface.resume();}

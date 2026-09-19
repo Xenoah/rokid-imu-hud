@@ -1,5 +1,7 @@
 UPDATED 2026-09-19 UTC
-APK: SIGNED_AND_VERIFIED
+APK: 0.1.1 SIGNED_AND_VERIFIED
+Startup fix: remove pre-decor Window.getInsetsController access
+Same signing certificate as 0.1.0: CONFIRMED
 Build route: tools/build-apk.py (direct Android SDK tools)
 Android Java compilation: PASS (API 36 public stubs, target 35, min 31)
 DEX generation: PASS

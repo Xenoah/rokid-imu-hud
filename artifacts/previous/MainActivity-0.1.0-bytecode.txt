@@ -1,0 +1,251 @@
+Compiled from "MainActivity.java"
+public final class dev.xenoah.hud.MainActivity extends android.app.Activity {
+  private static final java.lang.String RESET;
+
+  private static final java.lang.String TAKE;
+
+  private static final java.lang.String LEG;
+
+  private dev.xenoah.hud.SensorController sensors;
+
+  private dev.xenoah.hud.HudSurface surface;
+
+  private dev.xenoah.hud.Diagnostics diagnostics;
+
+  private boolean registered;
+
+  private boolean foreground;
+
+  private boolean worn;
+
+  private boolean open;
+
+  private final android.content.BroadcastReceiver receiver;
+
+  public dev.xenoah.hud.MainActivity();
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method android/app/Activity."<init>":()V
+       4: aload_0
+       5: iconst_1
+       6: putfield      #7                  // Field worn:Z
+       9: aload_0
+      10: iconst_1
+      11: putfield      #13                 // Field open:Z
+      14: aload_0
+      15: new           #16                 // class dev/xenoah/hud/MainActivity$1
+      18: dup
+      19: aload_0
+      20: invokespecial #18                 // Method dev/xenoah/hud/MainActivity$1."<init>":(Ldev/xenoah/hud/MainActivity;)V
+      23: putfield      #21                 // Field receiver:Landroid/content/BroadcastReceiver;
+      26: return
+
+  public void onCreate(android.os.Bundle);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #25                 // Method android/app/Activity.onCreate:(Landroid/os/Bundle;)V
+       5: aload_0
+       6: invokevirtual #29                 // Method getWindow:()Landroid/view/Window;
+       9: sipush        128
+      12: invokevirtual #35                 // Method android/view/Window.addFlags:(I)V
+      15: aload_0
+      16: invokevirtual #29                 // Method getWindow:()Landroid/view/Window;
+      19: iconst_0
+      20: invokevirtual #41                 // Method android/view/Window.setDecorFitsSystemWindows:(Z)V
+      23: aload_0
+      24: invokevirtual #29                 // Method getWindow:()Landroid/view/Window;
+      27: invokevirtual #45                 // Method android/view/Window.getInsetsController:()Landroid/view/WindowInsetsController;
+      30: astore_2
+      31: aload_2
+      32: ifnull        51
+      35: aload_2
+      36: invokestatic  #49                 // Method android/view/WindowInsets$Type.systemBars:()I
+      39: invokeinterface #55,  2           // InterfaceMethod android/view/WindowInsetsController.hide:(I)V
+      44: aload_2
+      45: iconst_2
+      46: invokeinterface #60,  2           // InterfaceMethod android/view/WindowInsetsController.setSystemBarsBehavior:(I)V
+      51: aload_0
+      52: invokevirtual #63                 // Method getIntent:()Landroid/content/Intent;
+      55: ldc           #67                 // String debug
+      57: iconst_0
+      58: invokevirtual #69                 // Method android/content/Intent.getBooleanExtra:(Ljava/lang/String;Z)Z
+      61: istore_3
+      62: new           #75                 // class dev/xenoah/hud/core/Exchange
+      65: dup
+      66: invokespecial #77                 // Method dev/xenoah/hud/core/Exchange."<init>":()V
+      69: astore        4
+      71: aload_0
+      72: new           #78                 // class dev/xenoah/hud/SensorController
+      75: dup
+      76: aload_0
+      77: aload         4
+      79: aload_0
+      80: invokevirtual #63                 // Method getIntent:()Landroid/content/Intent;
+      83: ldc           #80                 // String force_fusion
+      85: iconst_0
+      86: invokevirtual #69                 // Method android/content/Intent.getBooleanExtra:(Ljava/lang/String;Z)Z
+      89: invokespecial #82                 // Method dev/xenoah/hud/SensorController."<init>":(Landroid/content/Context;Ldev/xenoah/hud/core/Exchange;Z)V
+      92: putfield      #85                 // Field sensors:Ldev/xenoah/hud/SensorController;
+      95: aload_0
+      96: new           #89                 // class dev/xenoah/hud/HudSurface
+      99: dup
+     100: aload_0
+     101: aload         4
+     103: iload_3
+     104: invokespecial #91                 // Method dev/xenoah/hud/HudSurface."<init>":(Landroid/content/Context;Ldev/xenoah/hud/core/Exchange;Z)V
+     107: putfield      #92                 // Field surface:Ldev/xenoah/hud/HudSurface;
+     110: aload_0
+     111: aload_0
+     112: getfield      #92                 // Field surface:Ldev/xenoah/hud/HudSurface;
+     115: invokevirtual #96                 // Method setContentView:(Landroid/view/View;)V
+     118: aload_0
+     119: new           #100                // class dev/xenoah/hud/Diagnostics
+     122: dup
+     123: aload_0
+     124: aload         4
+     126: iload_3
+     127: invokespecial #102                // Method dev/xenoah/hud/Diagnostics."<init>":(Landroid/content/Context;Ldev/xenoah/hud/core/Exchange;Z)V
+     130: putfield      #103                // Field diagnostics:Ldev/xenoah/hud/Diagnostics;
+     133: return
+
+  protected void onResume();
+    Code:
+       0: aload_0
+       1: invokespecial #107                // Method android/app/Activity.onResume:()V
+       4: aload_0
+       5: iconst_1
+       6: putfield      #110                // Field foreground:Z
+       9: new           #113                // class android/content/IntentFilter
+      12: dup
+      13: invokespecial #115                // Method android/content/IntentFilter."<init>":()V
+      16: astore_1
+      17: aload_1
+      18: ldc           #116                // String com.android.action.ACTION_TWO_FINGER_DOUBLE_TAP
+      20: invokevirtual #118                // Method android/content/IntentFilter.addAction:(Ljava/lang/String;)V
+      23: aload_1
+      24: ldc           #122                // String com.rokid.sprite.ACTION_TAKE_STATUS_CHANGED
+      26: invokevirtual #118                // Method android/content/IntentFilter.addAction:(Ljava/lang/String;)V
+      29: aload_1
+      30: ldc           #124                // String com.rokid.sprite.ACTION_LEG_STATUS_CHANGED
+      32: invokevirtual #118                // Method android/content/IntentFilter.addAction:(Ljava/lang/String;)V
+      35: getstatic     #126                // Field android/os/Build$VERSION.SDK_INT:I
+      38: bipush        33
+      40: if_icmplt     57
+      43: aload_0
+      44: aload_0
+      45: getfield      #21                 // Field receiver:Landroid/content/BroadcastReceiver;
+      48: aload_1
+      49: iconst_2
+      50: invokevirtual #134                // Method registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;I)Landroid/content/Intent;
+      53: pop
+      54: goto          67
+      57: aload_0
+      58: aload_0
+      59: getfield      #21                 // Field receiver:Landroid/content/BroadcastReceiver;
+      62: aload_1
+      63: invokevirtual #138                // Method registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;
+      66: pop
+      67: aload_0
+      68: iconst_1
+      69: putfield      #141                // Field registered:Z
+      72: aload_0
+      73: invokevirtual #144                // Method updateRunning:()V
+      76: return
+
+  private void updateRunning();
+    Code:
+       0: aload_0
+       1: getfield      #110                // Field foreground:Z
+       4: ifeq          48
+       7: aload_0
+       8: getfield      #7                  // Field worn:Z
+      11: ifeq          48
+      14: aload_0
+      15: getfield      #13                 // Field open:Z
+      18: ifeq          48
+      21: aload_0
+      22: invokevirtual #29                 // Method getWindow:()Landroid/view/Window;
+      25: sipush        128
+      28: invokevirtual #35                 // Method android/view/Window.addFlags:(I)V
+      31: aload_0
+      32: getfield      #85                 // Field sensors:Ldev/xenoah/hud/SensorController;
+      35: invokevirtual #147                // Method dev/xenoah/hud/SensorController.start:()V
+      38: aload_0
+      39: getfield      #92                 // Field surface:Ldev/xenoah/hud/HudSurface;
+      42: invokevirtual #150                // Method dev/xenoah/hud/HudSurface.resume:()V
+      45: goto          72
+      48: aload_0
+      49: invokevirtual #29                 // Method getWindow:()Landroid/view/Window;
+      52: sipush        128
+      55: invokevirtual #153                // Method android/view/Window.clearFlags:(I)V
+      58: aload_0
+      59: getfield      #85                 // Field sensors:Ldev/xenoah/hud/SensorController;
+      62: invokevirtual #156                // Method dev/xenoah/hud/SensorController.stop:()V
+      65: aload_0
+      66: getfield      #92                 // Field surface:Ldev/xenoah/hud/HudSurface;
+      69: invokevirtual #159                // Method dev/xenoah/hud/HudSurface.pause:()V
+      72: return
+
+  protected void onPause();
+    Code:
+       0: aload_0
+       1: iconst_0
+       2: putfield      #110                // Field foreground:Z
+       5: aload_0
+       6: invokevirtual #144                // Method updateRunning:()V
+       9: aload_0
+      10: getfield      #141                // Field registered:Z
+      13: ifeq          29
+      16: aload_0
+      17: aload_0
+      18: getfield      #21                 // Field receiver:Landroid/content/BroadcastReceiver;
+      21: invokevirtual #162                // Method unregisterReceiver:(Landroid/content/BroadcastReceiver;)V
+      24: aload_0
+      25: iconst_0
+      26: putfield      #141                // Field registered:Z
+      29: aload_0
+      30: invokespecial #166                // Method android/app/Activity.onPause:()V
+      33: return
+
+  protected void onDestroy();
+    Code:
+       0: aload_0
+       1: getfield      #85                 // Field sensors:Ldev/xenoah/hud/SensorController;
+       4: invokevirtual #169                // Method dev/xenoah/hud/SensorController.close:()V
+       7: aload_0
+       8: getfield      #92                 // Field surface:Ldev/xenoah/hud/HudSurface;
+      11: invokevirtual #172                // Method dev/xenoah/hud/HudSurface.close:()V
+      14: aload_0
+      15: getfield      #103                // Field diagnostics:Ldev/xenoah/hud/Diagnostics;
+      18: invokevirtual #173                // Method dev/xenoah/hud/Diagnostics.close:()V
+      21: aload_0
+      22: invokespecial #174                // Method android/app/Activity.onDestroy:()V
+      25: return
+
+  public boolean dispatchKeyEvent(android.view.KeyEvent);
+    Code:
+       0: aload_1
+       1: invokevirtual #177                // Method android/view/KeyEvent.getKeyCode:()I
+       4: bipush        66
+       6: if_icmpne     40
+       9: aload_1
+      10: invokevirtual #182                // Method android/view/KeyEvent.getAction:()I
+      13: iconst_1
+      14: if_icmpne     38
+      17: aload_1
+      18: invokevirtual #185                // Method android/view/KeyEvent.isCanceled:()Z
+      21: ifne          38
+      24: aload_1
+      25: invokevirtual #189                // Method android/view/KeyEvent.getRepeatCount:()I
+      28: ifne          38
+      31: aload_0
+      32: getfield      #85                 // Field sensors:Ldev/xenoah/hud/SensorController;
+      35: invokevirtual #192                // Method dev/xenoah/hud/SensorController.nextMode:()V
+      38: iconst_1
+      39: ireturn
+      40: aload_0
+      41: aload_1
+      42: invokespecial #195                // Method android/app/Activity.dispatchKeyEvent:(Landroid/view/KeyEvent;)Z
+      45: ireturn
+}

@@ -2,7 +2,7 @@
 
 更新日：2026-09-19 UTC。
 
-成果物は `dist/RokidHUD-0.1.0-debug.apk`。アプリID `dev.xenoah.rokidhud`、versionCode 1、versionName `0.1.0-preview`、minSdk 31、targetSdk 35。Android 12以降向けの、デバッグ署名付き・CPU ABI非依存のAPKです。
+成果物は `dist/RokidHUD-0.1.1-debug.apk`。アプリID `dev.xenoah.rokidhud`、versionCode 2、versionName `0.1.1-preview`、minSdk 31、targetSdk 35。Android 12以降向けの、デバッグ署名付き・CPU ABI非依存のAPKです。起動不具合の修正は [startup-fix-0.1.1.md](startup-fix-0.1.1.md) に記録しています。
 
 ## ビルド
 
@@ -16,7 +16,7 @@ Gradleの配布先へ接続できない問題が残っていたため、取得�
 
 元のGradle構成はcompileSdk 35です。今回の直接ビルドはAPI 36の公開スタブを使用しますが、ManifestのminSdk 31 / targetSdk 35を維持しています。アプリのAPI 33 receiverフラグはOSバージョンで分岐します。API 36でdeprecatedになった `Window.setDecorFitsSystemWindows` の警告が1件あります。このメソッドは対応対象のAndroid 12で使用できます。コンパイルエラーはありません。
 
-Manifestの相対Activity名は、Gradleと同様にnamespaceで完全修飾名へ展開しています。applicationIdとの取り違えによる起動クラス欠落を避け、APKから読み戻して確認しました。アプリ本体の機能や表示デザインは前版から変更していません。
+Manifestの相対Activity名は、Gradleと同様にnamespaceで完全修飾名へ展開しています。applicationIdとの取り違えによる起動クラス欠落を避け、APKから読み戻して確認しました。0.1.1では画面初期化の順序と起動段階のログを修正しています。
 
 直接ビルドは、公式SDKをインストールした環境でも以下で再現できます。
 
@@ -36,7 +36,7 @@ python3 tools/build-apk.py --android-jar /path/to/android.jar --tools-dir /path/
 | 署名後APKの4バイト整列 | 合格 |
 | Manifest・DEXの構造検査 | 11項目合格 |
 | 起動Activityと実装クラスの一致 | `dev.xenoah.hud.MainActivity` を確認 |
-| DEX内容 | 36クラス、359メソッド。センサー・融合・描画・演算の実装を確認 |
+| DEX内容 | 36クラス、363メソッド。センサー・融合・描画・演算の実装を確認 |
 | 不要クラスの混入 | Androidスタブ、デスクトッププレビュー、テストクラスなし |
 | 権限 | uses-permission宣言なし。通信・Bluetooth権限なし |
 | 模擬IMU回帰試験 | 16項目合格 |
@@ -52,7 +52,7 @@ python3 tools/build-apk.py --android-jar /path/to/android.jar --tools-dir /path/
 `tools/debug-device.py` は、ADB接続した実機へのインストール、デバッグ起動、15秒間のプロセス監視、校正後の有効CSV行の確認、Logcat採取をまとめます。ボタンイベントを注入して物理操作の代わりにする処理はありません。
 
 ```sh
-python3 tools/debug-device.py --apk dist/RokidHUD-0.1.0-debug.apk
+python3 tools/debug-device.py --apk dist/RokidHUD-0.1.1-debug.apk
 ```
 
 具体的な動作確認項目は [device-acceptance.md](device-acceptance.md)。署名が異なる旧APKをスクリプトが勝手に削除することはありません。今回のデバッグ署名鍵はソースZIPに含めていないため、別のPCでビルドしたAPKへ更新するときは署名の一致を確認してください。

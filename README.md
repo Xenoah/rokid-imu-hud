@@ -2,7 +2,7 @@
 >
 > **Unofficial and unaffiliated: This is an independent community project. It is not affiliated with, endorsed by, or sponsored by Rokid. The Rokid name is used only to identify compatible hardware.**
 
-# IMU HUD for Rokid Glasses — 0.1.0-preview
+# IMU HUD for Rokid Glasses — 0.1.1-preview
 
 [日本語](#概要--overview) | [English documentation](README.en.md) | [Releases](https://github.com/Xenoah/rokid-imu-hud/releases)
 
@@ -12,15 +12,17 @@ Rokid Glasses本体で動作する非公式の水平儀＋2軸Gメーター。�
 
 An unofficial standalone artificial horizon and two-axis G meter for Rokid Glasses. IMU processing, attitude estimation and HUD rendering run entirely on the glasses, without a phone, Bluetooth link or server.
 
-**初版：水平儀＋2軸Gメーター / Initial horizon and two-axis G meter**
+**起動時の画面初期化を修正 / Fix startup window initialization**
 
-[APK・ソースのダウンロード / Download APK and source](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.0-preview)
+[APK・ソースのダウンロード / Download APK and source](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.1-preview)
 
 > 履歴保存用プレリリース / Historical prerelease. 最新版は [Releases](https://github.com/Xenoah/rokid-imu-hud/releases/latest) を確認してください。
 
 Rokid Glasses（Snapdragon AR1 / YodaOS-Sprite）本体で動作する、水平儀＋2軸GメーターのAndroidアプリ。Java 17で実装しています。通常動作時のスマートフォン、Bluetooth、外部センサー、ネット接続は不要です。
 
-**状態：署名済みデバッグAPKを生成済み。Androidコードのコンパイル、DEX変換、署名・整列検証、11項目のAPK内部検査、16項目の模擬IMU試験に合格しました。** `dist/RokidHUD-0.1.0-debug.apk` を同梱しています。Rokid実機・Androidエミュレーターでの起動試験は未実施です。実機60fps、200Hz取得、ボタン配送、軸の符号は未確認です。
+**0.1.1：起動時の画面初期化順序を修正しました。** 0.1.0ではDecorView生成前に `Window.getInsetsController()` を呼び、Android 12の実装でNullPointerExceptionが発生し得ました。画面生成後のView API呼び出しへ変更しています。調査根拠と検証範囲は [docs/startup-fix-0.1.1.md](docs/startup-fix-0.1.1.md) を参照してください。
+
+**状態：署名済みデバッグAPKを生成済み。Androidコードのコンパイル、DEX変換、署名・整列検証、11項目のAPK内部検査、16項目の模擬IMU試験に合格しました。** `dist/RokidHUD-0.1.1-debug.apk` を同梱しています。Rokid実機・Androidエミュレーターでの起動試験は未実施です。実機60fps、200Hz取得、ボタン配送、軸の符号は未確認です。
 
 今回は利用できるAOSP Androidビルドツールを直接実行し、APKを生成しました。Gradleのダウンロード制限は残っているため、Gradle経由のビルド・Android lintは未実施です。直接ビルドの再現方法と検証範囲は [docs/apk-debug-report.md](docs/apk-debug-report.md) を参照してください。
 
@@ -87,7 +89,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n dev.xenoah.rokidhud/dev.xenoah.hud.MainActivity
 ```
 
-同梱APKを使う場合のインストール先は `dist/RokidHUD-0.1.0-debug.apk` です。署名の異なる旧APKがある場合、`INSTALL_FAILED_UPDATE_INCOMPATIBLE` になります。自動アンインストールは行いません。必要なログを保存してから旧版を削除すると、そのアプリの保存データも消去されます。
+同梱APKを使う場合のパスは `dist/RokidHUD-0.1.1-debug.apk` です。配布済み0.1.0と同一署名なので `adb install -r` で上書きできます。署名の異なる別ビルドがある場合、`INSTALL_FAILED_UPDATE_INCOMPATIBLE` になります。自動アンインストールは行いません。必要なログを保存してから旧版を削除すると、そのアプリの保存データも消去されます。
 
 または `tools/install.ps1`。複数のAndroid機器が見える場合は `-Serial 実機シリアル` を付けます。ADBが `unauthorized` なら正規の認証手順を完了してください。
 
@@ -139,11 +141,11 @@ CSVはアプリのprivate領域 `files/hud-debug.csv`。10Hzで最大36,000行�
 実機へ転送し、起動・プロセス生存・校正完了・アプリのログを15秒間確認するスクリプトも同梱しています。
 
 ```powershell
-python .\tools\debug-device.py --apk .\dist\RokidHUD-0.1.0-debug.apk
+python .\tools\debug-device.py --apk .\dist\RokidHUD-0.1.1-debug.apk
 # 複数端末がある場合は --serial 実機シリアル を追加
 ```
 
-実行中は頭を静止させてください。結果は `device-logs/日時/result.json`、CSV、Logcatへ保存します。`RUNTIME_SMOKE_PASS` は起動・プロセス生存・有効センサーデータの確認であり、傾斜・ボタン・60fpsの合格判定ではありません。このスクリプト自体も接続実機では未実行です。
+実行中は頭を静止させてください。結果は `device-logs/日時/result.json`、CSV、Logcatへ保存します。0.1.1ではプロセスID取得前に起動失敗しても、アプリのUIDで `startup-logcat.txt` を採取します。`RUNTIME_SMOKE_PASS` は起動・プロセス生存・有効センサーデータの確認であり、傾斜・ボタン・60fpsの合格判定ではありません。このスクリプト自体も接続実機では未実行です。疑似ADBによる3種類の失敗経路のログ保存試験を実施済みです。
 
 ## 検証
 
