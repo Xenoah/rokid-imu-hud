@@ -1,0 +1,11 @@
+UPDATED 2026-09-19 UTC
+APK: SIGNED_AND_VERIFIED
+Build route: tools/build-apk.py (direct Android SDK tools)
+Android Java compilation: PASS (API 36 public stubs, target 35, min 31)
+DEX generation: PASS
+APK v3 signature and zip alignment: PASS
+APK static inspection: 11 checks PASS
+Core synthetic tests: 16 PASS
+Gradle / Android lint: NOT RUN (Gradle download unavailable)
+Android runtime / Rokid physical device: NOT RUN (no runtime or device attached)
+Details: docs/apk-debug-report.md

@@ -1,0 +1,18 @@
+PASS	Static native quaternion: G approximately zero
+PASS	Right and left tilt signs
+PASS	Look up and down signs
+PASS	Forward braking and lateral acceleration
+PASS	Quaternion reference transform follows reset frame, not head local axes
+PASS	Pure yaw does not change horizon, even after a tilted reset
+PASS	Gravity removal with bias over random orientations
+PASS	Moving calibration is rejected and recovers when still
+PASS	4Hz filter: bounded delay and vibration attenuation
+PASS	Stale, reversed and NaN samples never masquerade as fresh
+METRIC	1h synthetic max tilt 0.008518 deg; max horizontal G 0.000837
+PASS	Fallback static one-hour drift with fixed bias and noise
+PASS	Fallback pitch and roll integration signs
+PASS	Fallback rejects large sustained linear acceleration as gravity
+PASS	Native to fallback switch forces a new reference
+PASS	Signed axis permutation transforms vectors and quaternion consistently
+PASS	Viewport preserves the requested 480x400 and official safe area
+RESULT	16 tests passed (synthetic data; no hardware attached)

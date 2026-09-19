@@ -1,0 +1,11 @@
+{
+  "tag": "v0.1.0-preview",
+  "title": "0.1.0-preview — 初版：水平儀＋2軸Gメーター / Initial horizon and two-axis G meter",
+  "prerelease": true,
+  "notes": "docs/releases/v0.1.0-preview.md",
+  "apk": "dist/RokidHUD-0.1.0-debug.apk",
+  "apk_sha256": "761d1675d3d3129b35d50d387ea9d0b7ce5ba64dd0317ddf03a11afe2673afd6",
+  "images": [
+    "artifacts/hud-combined-480x400.png"
+  ]
+}

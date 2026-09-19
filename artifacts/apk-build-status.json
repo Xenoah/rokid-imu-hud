@@ -1,0 +1,18 @@
+{
+  "status": "SIGNED_AND_VERIFIED",
+  "applicationId": "dev.xenoah.rokidhud",
+  "versionName": "0.1.0-preview",
+  "minSdk": 31,
+  "targetSdk": 35,
+  "physical_device_test": "NOT_RUN",
+  "tool_sha256": {
+    "/workspace/scratch/1fdb946f1b41/android-toolchain/platform/android.jar": "90aac4fab55caa58da95573644b32f135f6952c69d1dadb6b4a251fa0471202e",
+    "/workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/aapt2": "0f4474300b737e9bf68fcb3cbb3338c958e51899e3be93c6f429b3aae0ca48df",
+    "/workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/zipalign": "db322ca007a4ceac0e34688ad896a6ba95166334324c3d8c9db30c4e73d6cf1b",
+    "/workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/lib/d8.jar": "43d80449b448c7ec428fdadd10b967c0452545de9f7f9965361816dcf5022d30",
+    "/workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/lib/apksigner.jar": "9469c60e5e40fc5c44a2f2338509cb6600cdf065e9b50f9fa3ca6c5be5bae6a9"
+  },
+  "apk": "/workspace/scratch/1fdb946f1b41/rokid-hud/app/build/outputs/apk/debug/app-debug.apk",
+  "apk_sha256": "761d1675d3d3129b35d50d387ea9d0b7ce5ba64dd0317ddf03a11afe2673afd6",
+  "apk_bytes": 37336
+}

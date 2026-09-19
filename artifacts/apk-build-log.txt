@@ -1,0 +1,70 @@
+$ /workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/aapt2 compile --dir /workspace/scratch/1fdb946f1b41/rokid-hud/app/src/main/res -o /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/resources.zip
+
+$ /workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/aapt2 link -I /workspace/scratch/1fdb946f1b41/android-toolchain/platform/android.jar --manifest /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/AndroidManifest.xml --min-sdk-version 31 --target-sdk-version 35 --java /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/generated --custom-package dev.xenoah.hud -o /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/unsigned.apk /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/resources.zip
+
+$ /usr/bin/java com.sun.tools.javac.Main --release 17 -Xlint:all -g -encoding UTF-8 -cp /workspace/scratch/1fdb946f1b41/android-toolchain/platform/android.jar -d /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/classes /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/AxisMap.java /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/Config.java /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/Exchange.java /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/Fusion.java /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/HudCanvas.java /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/HudEngine.java /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/HudRenderer.java /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/Quat.java /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/Rate.java /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/Snapshot.java /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/Vec3.java /workspace/scratch/1fdb946f1b41/rokid-hud/core/src/main/java/dev/xenoah/hud/core/Viewport.java /workspace/scratch/1fdb946f1b41/rokid-hud/app/src/main/java/dev/xenoah/hud/AndroidHudCanvas.java /workspace/scratch/1fdb946f1b41/rokid-hud/app/src/main/java/dev/xenoah/hud/Diagnostics.java /workspace/scratch/1fdb946f1b41/rokid-hud/app/src/main/java/dev/xenoah/hud/HudSurface.java /workspace/scratch/1fdb946f1b41/rokid-hud/app/src/main/java/dev/xenoah/hud/MainActivity.java /workspace/scratch/1fdb946f1b41/rokid-hud/app/src/main/java/dev/xenoah/hud/SensorController.java /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/generated/dev/xenoah/hud/R.java
+/workspace/scratch/1fdb946f1b41/rokid-hud/app/src/main/java/dev/xenoah/hud/MainActivity.java:45: warning: [deprecation] setDecorFitsSystemWindows(boolean) in Window has been deprecated
+        getWindow().setDecorFitsSystemWindows(false);
+                   ^
+1 warning
+
+$ /usr/bin/java -cp /workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/lib/d8.jar com.android.tools.r8.D8 --debug --min-api 31 --lib /workspace/scratch/1fdb946f1b41/android-toolchain/platform/android.jar --output /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/dex /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/classes.jar
+
+$ /workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/zipalign -f 4 /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/unsigned.apk /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/aligned.apk
+
+$ /usr/bin/keytool -genkeypair -keystore /workspace/scratch/1fdb946f1b41/rokid-hud/.build/hud-debug.keystore -alias androiddebugkey -storepass android -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname CN=Rokid HUD Debug,O=Local Development,C=JP
+Generating 2,048 bit RSA key pair and self-signed certificate (SHA256withRSA) with a validity of 10,000 days
+	for: CN=Rokid HUD Debug, O=Local Development, C=JP
+
+$ /usr/bin/java -jar /workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/lib/apksigner.jar sign --ks /workspace/scratch/1fdb946f1b41/rokid-hud/.build/hud-debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --v4-signing-enabled false --out /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/outputs/apk/debug/app-debug.apk /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/sdk-direct/aligned.apk
+
+$ /usr/bin/java -jar /workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/lib/apksigner.jar verify --verbose --print-certs --min-sdk-version 31 /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/outputs/apk/debug/app-debug.apk
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): false
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Rokid HUD Debug, O=Local Development, C=JP
+Signer #1 certificate SHA-256 digest: 2b81b9ecb6381e44864effce1a587ab7772443bef86467408b4d3fb277d6c501
+Signer #1 certificate SHA-1 digest: 516c3263634609f7572149238dd9d795622c3887
+Signer #1 certificate MD5 digest: 9e68f7ad786d041155f1ba11b3a13377
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 2048
+Signer #1 public key SHA-256 digest: 4ea686eeae84cb67c3ac60ec21ce1a02c563ad18b696787217c99b8bb120995e
+Signer #1 public key SHA-1 digest: 764941484170f2b7fa66497d1193c76d197315ec
+Signer #1 public key MD5 digest: 02d7ba5cdef1b3be74e370df22d0a47a
+
+$ /workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/zipalign -c -v 4 /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/outputs/apk/debug/app-debug.apk
+Verifying alignment of /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/outputs/apk/debug/app-debug.apk (4)...
+      49 AndroidManifest.xml (OK - compressed)
+    1109 res/drawable/ic_hud.xml (OK - compressed)
+    1552 resources.arsc (OK)
+    2417 classes.dex (OK - compressed)
+   29874 META-INF/ANDROIDD.SF (OK - compressed)
+   30275 META-INF/ANDROIDD.RSA (OK - compressed)
+   31409 META-INF/MANIFEST.MF (OK - compressed)
+Verification succesful
+
+$ /workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/aapt2 dump badging /workspace/scratch/1fdb946f1b41/rokid-hud/app/build/outputs/apk/debug/app-debug.apk
+package: name='dev.xenoah.rokidhud' versionCode='1' versionName='0.1.0-preview' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'
+minSdkVersion:'31'
+targetSdkVersion:'35'
+application-label:'Rokid HUD'
+application-icon-160:'res/drawable/ic_hud.xml'
+application: label='Rokid HUD' icon='res/drawable/ic_hud.xml'
+application-debuggable
+launchable-activity: name='dev.xenoah.hud.MainActivity'  label='' icon=''
+feature-group: label=''
+  uses-feature: name='android.hardware.sensor.accelerometer'
+  uses-feature: name='android.hardware.sensor.gyroscope'
+  uses-feature-not-required: name='android.hardware.touchscreen'
+  uses-feature: name='android.hardware.screen.portrait'
+  uses-implied-feature: name='android.hardware.screen.portrait' reason='one or more activities have specified a portrait orientation'
+main
+supports-screens: 'small' 'normal' 'large' 'xlarge'
+supports-any-density: 'true'
+locales: '--_--'
+densities: '160'

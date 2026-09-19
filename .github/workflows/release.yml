@@ -1,0 +1,35 @@
+name: Publish versioned release
+
+on:
+  push:
+    branches: [main]
+    paths: [release.json]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Verify archived source and APK checksums
+        run: sha256sum --check SHA256SUMS
+      - name: Run this version's IMU regression tests
+        run: sh tools/test-core.sh
+      - name: Publish APK, source, screenshots and bilingual notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: python3 tools/publish-release.py
