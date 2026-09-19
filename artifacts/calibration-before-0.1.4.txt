@@ -1,0 +1,12 @@
+Baseline: unmodified core main sources from delivered 0.1.3 ZIP; current 0.1.4 RecoveryCalibrationTests.
+Synthetic inputs inspired by the user video, not a replay of physical IMU logs.
+FAIL	Drifting OS pose cannot erase a quiet raw-IMU calibration window: drifting source blocked startup axis=0 hz=198
+FAIL	Raw fusion can estimate a stationary 4.5deg/s offset at startup: raw mean was incorrectly treated as movement before bias estimation
+PASS	Real pitch movement is rejected by measured gravity direction
+FAIL	Recovery waits for motion to stop, then completes without restarting the app: recover from movement and drifting OS
+FAIL	Raw-path recenter re-estimates bias and clears peak and filters: initial raw calibration
+FAIL	Calibration cannot count an accelerometer gap as quiet observation: gap cannot satisfy calibration duration
+FAIL	A stationary offset beyond the native limit can use raw calibration: native bias gate must not restart forever
+RECOVERY RESULT	1 passed; 6 failed (synthetic only)
+Exception in thread "main" java.lang.AssertionError: 6 recovery regressions failed
+	at dev.xenoah.hud.core.RecoveryCalibrationTests.main(RecoveryCalibrationTests.java:102)

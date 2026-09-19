@@ -35,8 +35,10 @@ public final class HudRenderer {
                 c.text("POSE",55,339,13,190);
                 if(s.nativePose)number(c,s.calibrationPoseRange,1,104,339,15,false);
                 else c.text("--",104,339,15,190);
-                c.text("DEG",151,339,13,190);c.text("MEAN",225,339,13,190);
-                number(c,Math.toDegrees(s.calibrationGyroMean),2,283,339,15,false);c.text("D/S",354,339,13,190);
+                c.text("DEG",151,339,13,190);c.text("TILT",225,339,13,190);
+                number(c,s.calibrationTiltRange,1,283,339,15,false);c.text("DEG",354,339,13,190);
+                c.text("GYRO MEAN",55,360,12,190);
+                number(c,Math.toDegrees(s.calibrationGyroMean),2,147,360,13,false);c.text("D/S",209,360,12,190);
             }
         } else if(!fresh) {
             c.text("IMU STALE",155,184,25,255);
@@ -50,7 +52,7 @@ public final class HudRenderer {
                 trailCount=0;
             }
         }
-        if(debug) {
+        if(debug&&!calibration) {
             c.text("A",18,358,12,180);number(c,s.accHz,0,32,358,12,false);
             c.text("G",80,358,12,180);number(c,s.gyroHz,0,94,358,12,false);
             c.text(s.nativePose?"OS QUAT":"MAHONY",155,358,12,180);
@@ -69,6 +71,7 @@ public final class HudRenderer {
             case ACCEL_MOVING:return "LAST: MOTION / VIBRATION";
             case ACCEL_SCALE:return "CHECK ACCEL SIGNAL";
             case POSE_MISMATCH:return "SWITCHING TO IMU FUSION";
+            case POSE_UNSTABLE:return "OS UNSTABLE - IMU CAL";
             case ACCEL_BIAS:return "ACCEL OFFSET TOO HIGH";
             default:return "SAMPLING - KEEP STILL";
         }

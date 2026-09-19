@@ -35,7 +35,7 @@ final class Diagnostics {
         handler.post(()->{
             try{
                 writer=new BufferedWriter(new FileWriter(file,false));
-                writer.write("elapsed_ns,pitch_deg,roll_deg,lat_g,long_g,peak_g,raw_lat_g,raw_long_g,acc_hz,gyro_hz,att_hz,acc_age_ms,att_age_ms,native,status,valid,ax,ay,az,gx,gy,gz,acc_bias_x,acc_bias_y,acc_bias_z,gyro_bias_x,gyro_bias_y,gyro_bias_z,cal_reason,cal_acc_std,cal_gyro_std,native_rejected,cal_pose_range_deg,cal_gyro_mean_rad_s\n");
+                writer.write("elapsed_ns,pitch_deg,roll_deg,lat_g,long_g,peak_g,raw_lat_g,raw_long_g,acc_hz,gyro_hz,att_hz,acc_age_ms,att_age_ms,native,status,valid,ax,ay,az,gx,gy,gz,acc_bias_x,acc_bias_y,acc_bias_z,gyro_bias_x,gyro_bias_y,gyro_bias_z,cal_reason,cal_acc_std,cal_gyro_std,native_rejected,cal_pose_range_deg,cal_gyro_mean_rad_s,cal_raw_tilt_deg\n");
                 handler.post(tick);
             }catch(IOException e){Log.e(TAG,"CSV open failed",e);}
         });
@@ -55,14 +55,14 @@ final class Diagnostics {
                 +"%.5f,%.5f,%.5f,%.5f,%.5f,"
                 +"%.2f,%.2f,%.2f,%.2f,%.2f,%s,%s,%s,"
                 +"%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,"
-                +"%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%s,%.6f,%.6f,%s,%.4f,%.6f%n",
+                +"%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%s,%.6f,%.6f,%s,%.4f,%.6f,%.4f%n",
                 now,snapshot.pitch,snapshot.roll,snapshot.lat,snapshot.longitudinal,snapshot.peak,
                 snapshot.rawLat,snapshot.rawLong,snapshot.accHz,snapshot.gyroHz,snapshot.attHz,
                 (now-snapshot.accTimeNs)*1e-6,(now-snapshot.attTimeNs)*1e-6,snapshot.nativePose,snapshot.status,snapshot.fresh(now),
                 snapshot.ax,snapshot.ay,snapshot.az,snapshot.gx,snapshot.gy,snapshot.gz,
                 snapshot.abx,snapshot.aby,snapshot.abz,snapshot.gbx,snapshot.gby,snapshot.gbz,
                 snapshot.calibrationReason,snapshot.calibrationAccStd,snapshot.calibrationGyroStd,snapshot.nativeRejected,
-                snapshot.calibrationPoseRange,snapshot.calibrationGyroMean));
+                snapshot.calibrationPoseRange,snapshot.calibrationGyroMean,snapshot.calibrationTiltRange));
             rows++;if(rows%20==0)writer.flush();
             if(rows<36_000)handler.postDelayed(this,100);else{writer.close();writer=null;Log.i(TAG,"CSV one-hour limit reached");}
         }catch(IOException e){Log.e(TAG,"CSV write failed",e);try{writer.close();}catch(IOException ignored){}writer=null;}

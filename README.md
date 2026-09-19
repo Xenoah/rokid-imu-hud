@@ -2,7 +2,7 @@
 >
 > **Unofficial and unaffiliated: This is an independent community project. It is not affiliated with, endorsed by, or sponsored by Rokid. The Rokid name is used only to identify compatible hardware.**
 
-# IMU HUD for Rokid Glasses — 0.1.3-preview
+# IMU HUD for Rokid Glasses — 0.1.4-preview
 
 [日本語](#概要--overview) | [English documentation](README.en.md) | [Releases](https://github.com/Xenoah/rokid-imu-hud/releases)
 
@@ -12,9 +12,9 @@ Rokid Glasses本体で動作する非公式の水平儀＋2軸Gメーター。�
 
 An unofficial standalone artificial horizon and two-axis G meter for Rokid Glasses. IMU processing, attitude estimation and HUD rendering run entirely on the glasses, without a phone, Bluetooth link or server.
 
-**装着中の頭の揺れを考慮 / Account for head movement during calibration**
+**不安定なOS姿勢から自前融合へ復帰 / Recover from unstable OS attitude**
 
-[APK・ソースのダウンロード / Download APK and source](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.3-preview)
+[APK・ソースのダウンロード / Download APK and source](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.4-preview)
 
 > 履歴保存用プレリリース / Historical prerelease. 最新版は [Releases](https://github.com/Xenoah/rokid-imu-hud/releases/latest) を確認してください。
 
@@ -33,13 +33,11 @@ The glasses image records approximately 198Hz input and the old calibration wait
 
 Rokid Glasses（Snapdragon AR1 / YodaOS-Sprite）本体で動作する、水平儀＋2軸GメーターのAndroidアプリ。Java 17で実装しています。通常動作時のスマートフォン、Bluetooth、外部センサー、ネット接続は不要です。
 
-**0.1.3：グラス装着中の校正判定を修正。** 実機写真では加速度・ジャイロ各約198Hzの受信と `LAST: ROTATION DETECTED` が確認できました。OS姿勢が使える場合は、角速度の大きさだけでなく校正窓全体の姿勢変化も確認します。OS姿勢から求めた回転分を引いてジャイロバイアスを推定し、小さな頭の揺れをそのままゼロ点へ混ぜないよう変更しました。詳細は [docs/calibration-fix-0.1.3.md](docs/calibration-fix-0.1.3.md)。
+**0.1.4：グラスで校正待機が繰り返される経路を修正。** 提供動画では約247HzでIMUを受信しながら、OS姿勢の変化によって校正窓を取り直していました。生の加速度・ジャイロの集計をOS姿勢の変化だけで消去しないように変更し、OS姿勢が不安定な場合は本体IMUによる自前融合へ切り替えます。安定した入力では切替込みで約2秒です。映像だけでは実際の回転とセンサーのずれを分離できないため、起動・RESET時には静止してください。詳細は [docs/calibration-fix-0.1.4.md](docs/calibration-fix-0.1.4.md)。
 
-**0.1.2：静止校正が終わらない問題への修正。** 姿勢センサーの更新間隔と静止中ノイズで校正が繰り返し初期化されるケースを再現し、時間窓の統計による判定へ変更しました。Quaternionが重力と整合しない場合はジャイロ＋加速度融合へ切り替えます。待機理由・加速度・ジャイロ値・取得Hzを画面に表示します。詳細は [docs/calibration-fix-0.1.2.md](docs/calibration-fix-0.1.2.md)。実機ログがないため、報告された個体の原因を確定したものではありません。
+**状態：署名済みデバッグAPKを生成済み。Androidコードのコンパイル、DEX変換、署名・整列検証、11項目のAPK内部検査、39項目の模擬IMU試験に合格しました。** `dist/RokidHUD-0.1.4-debug.apk` を同梱しています。0.1.3のユーザー動画では実機の起動・描画・約247HzのIMU受信を確認しましたが、校正が完了しませんでした。**修正版0.1.4の実機・エミュレーター試験は未実施です。** 実機60fps、継続的な取得レート、ボタン配送、軸の符号は未確認です。
 
-**0.1.1の起動修正も含みます。** 0.1.0ではDecorView生成前に `Window.getInsetsController()` を呼び、Android 12の実装でNullPointerExceptionが発生し得ました。画面生成後のView API呼び出しへ変更しています。調査根拠と検証範囲は [docs/startup-fix-0.1.1.md](docs/startup-fix-0.1.1.md) を参照してください。
-
-**状態：署名済みデバッグAPKを生成済み。Androidコードのコンパイル、DEX変換、署名・整列検証、11項目のAPK内部検査、32項目の模擬IMU試験に合格しました。** `dist/RokidHUD-0.1.3-debug.apk` を同梱しています。0.1.2はユーザー提供写真でRokid実機の起動・描画・約198HzのIMU受信を確認しましたが、校正で待機していました。**修正版0.1.3の実機・エミュレーター試験は未実施です。** 実機60fps、継続的な取得レート、ボタン配送、軸の符号は未確認です。
+以前の起動・校正修正も含みます。[起動順序の修正](docs/startup-fix-0.1.1.md)、[低頻度姿勢と静止ノイズへの対応](docs/calibration-fix-0.1.2.md)、[0.1.3時点の校正変更](docs/calibration-fix-0.1.3.md) は履歴として残しています。
 
 今回は利用できるAOSP Androidビルドツールを直接実行し、APKを生成しました。Gradleのダウンロード制限は残っているため、Gradle経由のビルド・Android lintは未実施です。直接ビルドの再現方法と検証範囲は [docs/apk-debug-report.md](docs/apk-debug-report.md) を参照してください。
 
@@ -52,7 +50,7 @@ Rokid Glasses（Snapdragon AR1 / YodaOS-Sprite）本体で動作する、水平�
 - OSの `TYPE_GAME_ROTATION_VECTOR` → `TYPE_ROTATION_VECTOR` → 加速度＋ジャイロのMahony方式という優先順位。
 - センサー専用スレッド、vsync描画専用スレッド、任意のCSV専用スレッド。200Hzを要求し、描画は60fpsを目標にします。
 - 重力除去→RESET時の基準Quaternionの逆回転→G換算→4Hz LPF。PEAKはフィルタ後の2軸合成値の最大。
-- 約1秒の静止校正。動いている間は確定しません。RESET完了時は `RECENTERED` を1秒表示。
+- 約1秒の静止校正。OS姿勢を棄却して自前融合へ切り替える場合は約2秒。大きな動き・振動・欠測は検査し、RESET完了時は `RECENTERED` を1秒表示。
 - 合成HUD／水平儀のみ／Gメーターのみの3モード。
 - センサー欠落、ストリーム停止、Quaternion停止・精度不良の検知。古い値は `IMU STALE` として隠します。
 - 本体を外す／つるを畳む場合の停止、復帰時の再校正。
@@ -106,7 +104,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n dev.xenoah.rokidhud/dev.xenoah.hud.MainActivity
 ```
 
-同梱APKを使う場合のパスは `dist/RokidHUD-0.1.3-debug.apk` です。配布済み0.1.0／0.1.1／0.1.2と同一署名なので `adb install -r` で上書きできます。署名の異なる別ビルドがある場合、`INSTALL_FAILED_UPDATE_INCOMPATIBLE` になります。自動アンインストールは行いません。必要なログを保存してから旧版を削除すると、そのアプリの保存データも消去されます。
+同梱APKを使う場合のパスは `dist/RokidHUD-0.1.4-debug.apk` です。配布済み0.1.0〜0.1.3と同一署名なので `adb install -r` で上書きできます。署名の異なる別ビルドがある場合、`INSTALL_FAILED_UPDATE_INCOMPATIBLE` になります。自動アンインストールは行いません。必要なログを保存してから旧版を削除すると、そのアプリの保存データも消去されます。
 
 または `tools/install.ps1`。複数のAndroid機器が見える場合は `-Serial 実機シリアル` を付けます。ADBが `unauthorized` なら正規の認証手順を完了してください。
 
@@ -125,13 +123,15 @@ RESETは前面・装着中のみ受け付け、重複イベントを750msで抑�
 
 ## 校正
 
-起動／RESET後に `CALIBRATING / KEEP HEAD STILL` を表示し、約1秒の連続した静止を待ちます。加速度・ジャイロを別々に集計し、最低各20サンプル、ジャイロ平均・分散、加速度分散・大きさ、姿勢変化を検査します。静止中の単発ノイズで毎回やり直す方式を廃止しました。校正時は最新ジャイロ／OS姿勢の150ms鮮度を確認し、ライブG計算用の30ms時刻差を校正には適用しません。
+起動／RESET後に `CALIBRATING / KEEP HEAD STILL` を表示し、約1秒の連続した観測を集めます。加速度・ジャイロは最低各20サンプル。大きさ・平均・分散に加え、平滑化した生加速度方向の変化が2°以内かを検査します。150msを超える入力欠落は静止時間に数えません。ライブG計算用の30ms時刻差を全校正サンプルへ強制しないため、20HzのOS姿勢でも集計できます。
 
-15秒で未完了なら `CALIBRATION WAIT` を表示し、直近の待機理由・ACC（重力を含む大きさ、静止時約1G）・GYRO（度/秒）・A/Gの実効Hzを併記します。`LAST:` は直近に静止窓を取り直した理由で、現在も動いていると断定する表示ではありません。0.1.3では `POSE`（窓の開始姿勢からの最大角度差）と `MEAN`（生ジャイロの平均ベクトルの大きさ、度/秒）も表示します。POSEはOS姿勢がない場合 `--` です。センサー欠落・不正な加速度スケール・持続する大きな運動を無条件で通過させるタイムアウトはありません。
+**OS姿勢が動いても、それだけで生データの窓を消しません。** 約1秒の生データの条件を満たした時点で、OS姿勢が2°を超えて変化していれば、そのセッションは自前融合へ切り替えて校正し直します。安定したOS姿勢では、そこから求めた実回転分をジャイロ平均から引き、残留バイアスを推定します。その大きさが0.10rad/sを超える場合も自前校正へ切り替えます。自前融合では静止している前提でジャイロ平均をバイアスとして取得し、絶対値を0.15rad/s以下に制限します。
 
-OS姿勢がある場合は、窓内すべての姿勢サンプルについて最初からの角度差が2°以内か確認し、ジャイロ平均からOS姿勢で観測した平均角速度を引いて残留バイアスを推定します。推定バイアスの上限は0.10rad/sです。自前融合だけの場合は従来の厳しい静止条件を維持し、ジャイロ平均を残留バイアスとして取得します。OS Quaternion使用時は平均加速度と予測重力との差を加速度バイアスとして取得します。自前融合時は、単一静止姿勢では傾斜誤差と横方向バイアスを分離できないため、重力方向の残差のみ推定します。これは工場校正・6面校正の代替ではありません。
+**6軸IMUだけでは一定速度のYaw回転と一定のジャイロオフセットを完全には区別できません。** 小さな持続加速度も静止と誤認する場合があります。頭を止め、加減速していない状態で校正してください。OS姿勢が使えない場合、単一姿勢から傾斜誤差と横方向の加速度バイアスも分離できないため、加速度バイアスは重力方向の残差のみ推定します。工場校正・6面校正の代替ではありません。
 
-完了時の姿勢をGメーターの基準Quaternionとして保存し、Pitch/Roll基準、LPF、Peakを初期化。起動は `READY`、以降は `RECENTERED` を1秒表示します。**RESETは約1秒の静止後に成立**する操作です。持続加速中はゼロ点が汚染され得るので、静止状態で実施してください。
+15秒で未完了なら `CALIBRATION WAIT` を表示します。`LAST:` は直近に窓を取り直した理由です。ACC（静止時約1G）、GYRO（度/秒）、A/Gの実効Hz、`POSE`（OS姿勢の最大変化）、`TILT`（生加速度方向の最大変化）、`GYRO MEAN`（生ジャイロ平均の大きさ）を表示します。OS姿勢を使わない間、POSEは `--` です。`OS UNSTABLE - IMU CAL` は自前融合への切替理由です。時間切れを理由に不正データを通してREADYにする処理はありません。
+
+校正完了時の姿勢をGメーターの基準Quaternionとして保存し、Pitch/Roll基準、LPF、Peakを初期化。起動は `READY`、以降は `RECENTERED` を1秒表示します。**RESETは静止校正が完了して成立**する操作です。安定した入力なら通常約1秒、姿勢源の切替を伴う場合は約2秒が目安です。
 
 ## 座標・演算・調整
 
@@ -153,14 +153,14 @@ adb logcat -v threadtime RokidHUD:I "*:S"
 .\tools\collect-logs.ps1
 ```
 
-CSVはアプリのprivate領域 `files/hud-debug.csv`。10Hzで最大36,000行（約1時間）、次のdebug起動で上書き。校正理由・標準偏差・OS姿勢棄却に加え、0.1.3では `cal_pose_range_deg`、`cal_gyro_mean_rad_s` も記録します。GPS・音声・カメラ・ネット送信はありません。`run-as` によるCSV取得にはdebug APKが必要です。描画時間はCPUでの描画・post所要時間であり、光子が目に届くまでのmotion-to-display latencyの実測ではありません。
+CSVはアプリのprivate領域 `files/hud-debug.csv`。10Hzで最大36,000行（約1時間）、次のdebug起動で上書き。校正理由・標準偏差・OS姿勢棄却・`cal_pose_range_deg`・`cal_gyro_mean_rad_s` に加え、0.1.4では `cal_raw_tilt_deg` も記録します（全35列）。GPS・音声・カメラ・ネット送信はありません。`run-as` によるCSV取得にはdebug APKが必要です。描画時間はCPUでの描画・post所要時間であり、光子が目に届くまでのmotion-to-display latencyの実測ではありません。
 
 自前融合の実機確認：起動時に `--ez force_fusion true` を追加してください。
 
 実機へ転送し、起動・プロセス生存・校正完了・アプリのログを15秒間確認するスクリプトも同梱しています。
 
 ```powershell
-python .\tools\debug-device.py --apk .\dist\RokidHUD-0.1.3-debug.apk
+python .\tools\debug-device.py --apk .\dist\RokidHUD-0.1.4-debug.apk
 # 複数端末がある場合は --serial 実機シリアル を追加
 ```
 
@@ -179,6 +179,7 @@ JDK 17のみで演算部の回帰試験を実行できます。Linuxは `tools/t
 - **測るのはメガネ本体に加わった加速度です。車両固定IMUではないため、頭部運動・回転中心からの距離・歩行振動が混入します。** LPFだけで車両加速度と頭部加速度を分離することはできません。
 - 6軸IMUだけでは持続する並進加速度と重力による傾きを完全に識別できません。自前融合では重力補正をゲートしますが、小さい持続加速度は傾きへ混入し得ます。OS Quaternionにも提供側の推定誤差があります。
 - GAME_ROTATION_VECTOR／自前6軸融合のYawは長時間でドリフトし、RESET時の前後左右G軸へ影響し得ます。Pitch/Roll表示は重力方向から求めるためYaw単独の回転に依存しません。
+- 自前校正には静止の前提が必要です。一定速度のYaw回転と一定のジャイロオフセットは区別できず、回転中に校正すると回転をバイアスに取り込む場合があります。
 - 静止校正は温度変化、スケール誤差、全軸バイアスを保証しません。センサーの実在種別・実効Hz・ノイズは個体／ファームウェアで変わります。
 - OS姿勢サンプル間はバイアス除去済みジャイロで最大100msだけ姿勢を進めます。ライブG計算では、この姿勢と加速度の時刻差が30msを超える場合、または最後のOS姿勢から100msを超えた場合を有効値にしません。高速回転では時間ずれが見かけの加速度を生むため、実機でログ確認が必要です。
 - ±90°付近のPitchではRollが不定になり、倒立で表示が切り替わり得ます。日常の頭部姿勢を対象とした表示です。
@@ -190,7 +191,7 @@ JDK 17のみで演算部の回帰試験を実行できます。Linuxは `tools/t
 | パス | 内容 |
 | --- | --- |
 | `app/` | Android Activity、公式入力、SensorManager、SurfaceView、ログ |
-| `core/` | Quaternion、融合、校正、G演算、共通描画、32項目の試験 |
+| `core/` | Quaternion、融合、校正、G演算、共通描画、39項目の試験 |
 | `tools/` | ビルド、転送、ログ収集、JDKのみの試験、プレビュー生成 |
 | `docs/` | 公式資料調査、数式、検証記録、実機チェック表 |
 | `artifacts/` | 模擬試験結果と共通描画コードによるプレビュー |

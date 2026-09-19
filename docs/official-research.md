@@ -46,3 +46,9 @@
 Android一次資料： [センサー概要](https://developer.android.com/develop/sensors-and-location/sensors/sensors_overview)、[モーションセンサー](https://developer.android.com/develop/sensors-and-location/sensors/sensors_motion)、[SurfaceHolder](https://developer.android.com/reference/android/view/SurfaceHolder)。ビルドの対応バージョンは[AGP 8.9公式表](https://developer.android.com/build/releases/agp-8-9-0-release-notes)を確認。
 
 スマートフォンアプリ、CXR-M、Bluetooth権限、Internet権限、OpenXR、Max/Station SDK、隠しAPI、root、独自の未確認 `RokidImuApi` 等は使っていません。
+
+## 2026-09-19：0.1.4での再確認
+
+[Androidモーションセンサー資料](https://developer.android.com/develop/sensors-and-location/sensors/sensors_motion)と[AOSPセンサー種別仕様](https://source.android.com/docs/core/interaction/sensors/sensor-types)を再確認しました。加速度の単位m/s²、ジャイロrad/s、Rotation Vectorの成分仕様に従い、単位や軸を今回の動画に合わせて推測変更することはしていません。
+
+今回の取得ではRokid IMU文書をWeb取得ツールから再取得できませんでした。上記のRokid固有のAPI根拠は、初回に公式ページ本文を確認した記録を引き継いでいます。動画には `OS QUAT` とA/G約247Hzが表示されていますが、これはアプリの表示値です。具体的なSensor名・minDelay・ファームウェア保証値・実機の生サンプルは未取得です。

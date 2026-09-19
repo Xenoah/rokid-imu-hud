@@ -36,8 +36,8 @@ public final class Preview implements HudCanvas {
             s.roll=i==1?0:12.5;s.pitch=i==1?0:3.2;s.lat=i==1?0:.42;s.longitudinal=i==1?0:.71;s.peak=1.28;
             if(i==5||i==7){s.status=i==5?Snapshot.Status.CALIBRATING:Snapshot.Status.WAIT_STILL;s.valid=false;s.progress=.6;
                 s.ay=Config.G*.99;s.gx=Math.toRadians(3.69);s.accHz=198;s.gyroHz=198;s.nativePose=true;
-                s.calibrationGyroMean=Math.toRadians(3.62);s.calibrationPoseRange=i==7?2.1:.4;
-                if(i==7)s.calibrationReason=Snapshot.CalibrationReason.ATTITUDE_MOVING;}
+                s.calibrationGyroMean=Math.toRadians(4.5);s.calibrationPoseRange=i==7?4.5:.4;s.calibrationTiltRange=.2;
+                if(i==7){s.nativePose=false;s.nativeRejected=true;s.calibrationReason=Snapshot.CalibrationReason.POSE_UNSTABLE;}}
             if(i==6)s.accTimeNs=now-1_000_000_000L;
             new HudRenderer().draw(p,s,now,480,height,false);
             ImageIO.write(p.image,"png",new File(dir,names[i]+".png"));p.g.dispose();

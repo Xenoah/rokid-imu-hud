@@ -28,9 +28,17 @@ CALIBRATION RESULT	8 passed; 0 failed (synthetic only)
 PASS	Stable native pose with 3.69deg/s gyro offset can calibrate
 PASS	Sub-degree head sway above the old gyro threshold can calibrate
 PASS	Small slow real rotation is subtracted from the gyro bias estimate
-PASS	Real sustained yaw at 3.69deg/s is not a stationary gyro offset
+PASS	Calibrating during constant yaw demonstrates the documented six-axis ambiguity
 PASS	Large out-and-back motion cannot hide behind equal endpoint poses
 PASS	Quaternion sign flips do not look like head motion
-PASS	Fallback without native attitude keeps conservative rotation rejection
+PASS	Fallback estimates a bounded stable raw rate under the keep-still assumption
 PASS	A validated gyro offset survives native-to-fusion handover
 WEAR CALIBRATION RESULT	8 passed; 0 failed (synthetic only)
+PASS	Drifting OS pose cannot erase a quiet raw-IMU calibration window
+PASS	Raw fusion can estimate a stationary 4.5deg/s offset at startup
+PASS	Real pitch movement is rejected by measured gravity direction
+PASS	Recovery waits for motion to stop, then completes without restarting the app
+PASS	Raw-path recenter re-estimates bias and clears peak and filters
+PASS	Calibration cannot count an accelerometer gap as quiet observation
+PASS	A stationary offset beyond the native limit can use raw calibration
+RECOVERY RESULT	7 passed; 0 failed (synthetic only)

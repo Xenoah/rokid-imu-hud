@@ -55,10 +55,13 @@ public final class WearCalibrationTests {
             check(f.s.valid,"small pose change can complete calibration");
             f.engine.copyGyroBias(f.bias);near(f.bias.x,.004,.001,"actual angular velocity is not bias");
         });
-        test("Real sustained yaw at 3.69deg/s is not a stationary gyro offset",()->{
+        test("Calibrating during constant yaw demonstrates the documented six-axis ambiguity",()->{
             Input f=new Input();double speed=Math.toRadians(3.69);
             for(int i=0;i<3300;i++)f.sample(i,1,true,speed*i*.005,speed,.004,false);
-            check(!f.s.valid&&f.s.status==Snapshot.Status.WAIT_STILL,"ongoing yaw must not become READY");
+            // These inputs are also produced by a stationary device with constant gyro bias
+            // and an OS pose integrating that bias. There is no independent yaw reference.
+            check(f.s.valid&&f.s.nativeRejected&&!f.s.nativePose,"raw keep-still assumption is explicit");
+            f.engine.copyGyroBias(f.bias);near(f.bias.y,speed+.004,.002,"constant yaw can contaminate bias if user moves");
         });
         test("Large out-and-back motion cannot hide behind equal endpoint poses",()->{
             Input f=new Input();double amp=Math.toRadians(4),frequency=2*Math.PI;
@@ -72,12 +75,13 @@ public final class WearCalibrationTests {
             for(int i=0;i<500&&!f.s.valid;i++)f.sample(i,1,false,0,0,.004,true);
             check(f.s.valid&&f.s.nativePose,"q and -q represent the same attitude");
         });
-        test("Fallback without native attitude keeps conservative rotation rejection",()->{
+        test("Fallback estimates a bounded stable raw rate under the keep-still assumption",()->{
             Input f=new Input();
             for(int i=0;i<3300;i++){
                 f.t+=5_000_000L;f.engine.onGyro(f.t,0,Math.toRadians(3.69),0);f.engine.onAccel(f.t,0,Config.G,0);
             }
-            f.exchange.read(f.s);check(!f.s.valid,"gravity alone cannot distinguish steady yaw from bias");
+            f.exchange.read(f.s);check(f.s.valid&&!f.s.nativePose,"constant bounded offset must be calibratable");
+            f.engine.copyGyroBias(f.bias);near(f.bias.y,Math.toRadians(3.69),.001,"residual offset estimate");
         });
         test("A validated gyro offset survives native-to-fusion handover",()->{
             Input f=new Input();double offset=Math.toRadians(3.69);

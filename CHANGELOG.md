@@ -1,5 +1,11 @@
 # Changelog / 変更履歴
 
+## [v0.1.4-preview](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.4-preview)
+
+OS姿勢だけの変化で生IMUの集計窓を消去しないように変更。不安定なOS姿勢は棄却し、本体の加速度・ジャイロによる融合へ切り替えます。
+
+Keeps the raw-IMU statistics window when only OS attitude changes. Rejects unstable OS attitude and switches to accelerometer/gyroscope fusion on the glasses.
+
 ## [v0.1.3-preview](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.3-preview)
 
 OS姿勢の変化も静止判定に使用し、OS姿勢から求めた回転分を差し引いてジャイロバイアスを推定します。
