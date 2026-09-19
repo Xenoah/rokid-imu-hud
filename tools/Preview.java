@@ -28,17 +28,19 @@ public final class Preview implements HudCanvas {
     public void text(char[] s,int n,float x,float y,float size,int a){text(new String(s,0,n),x,y,size,a);}
     public static void main(String[] args)throws Exception{
         File dir=new File(args.length==0?"artifacts":args[0]);dir.mkdirs();
-        String[] names={"hud-combined-480x400","hud-level-480x400","hud-horizon-480x400","hud-gmeter-480x400","hud-safe-area-480x640","hud-calibrating-480x400","hud-stale-480x400"};
+        String[] names={"hud-combined-480x400","hud-level-480x400","hud-horizon-480x400","hud-gmeter-480x400","hud-safe-area-480x640","hud-calibrating-480x400","hud-stale-480x400","hud-calibration-wait-480x400"};
         for(int i=0;i<names.length;i++){
             int height=i==4?640:400;Preview p=new Preview(480,height);Snapshot s=new Snapshot();
             long now=5_000_000_000L;s.timeNs=now;s.accTimeNs=now;s.gyroTimeNs=now;s.attTimeNs=now;
             s.status=Snapshot.Status.LIVE;s.valid=true;s.mode=i==2?2:i==3?3:1;
             s.roll=i==1?0:12.5;s.pitch=i==1?0:3.2;s.lat=i==1?0:.42;s.longitudinal=i==1?0:.71;s.peak=1.28;
-            if(i==5){s.status=Snapshot.Status.CALIBRATING;s.valid=false;s.progress=.6;}
+            if(i==5||i==7){s.status=i==5?Snapshot.Status.CALIBRATING:Snapshot.Status.WAIT_STILL;s.valid=false;s.progress=.6;
+                s.ay=Config.G;s.gx=.004;s.accHz=200;s.gyroHz=200;s.nativePose=true;
+                if(i==7)s.calibrationReason=Snapshot.CalibrationReason.ACCEL_MOVING;}
             if(i==6)s.accTimeNs=now-1_000_000_000L;
             new HudRenderer().draw(p,s,now,480,height,false);
             ImageIO.write(p.image,"png",new File(dir,names[i]+".png"));p.g.dispose();
         }
-        System.out.println("Rendered 7 previews using production HudRenderer");
+        System.out.println("Rendered "+names.length+" previews using production HudRenderer");
     }
 }

@@ -141,5 +141,6 @@ public final class CoreTests {
             v.fit(480,640);near(v.scale,1,0,"640 scale");near(v.y,120,0,"640 y");check(v.y>=80&&v.y+400<=560,"safe area");
         });
         System.out.println("RESULT\t"+passed+" tests passed (synthetic data; no hardware attached)");
+        CalibrationTests.main(args);
     }
 }

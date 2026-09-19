@@ -15,9 +15,16 @@ public final class Config {
     public static final long CALIBRATION_TIMEOUT_NS = 15_000_000_000L;
     public static final long FRESH_NS = 150_000_000L;
     public static final long MAX_PAIR_SKEW_NS = 30_000_000L;
+    public static final long MAX_POSE_PREDICTION_NS = 100_000_000L;
+    public static final int CALIBRATION_MIN_SAMPLES = 20;
+    public static final long CALIBRATION_MOTION_WINDOW_NS = 100_000_000L;
+    // Window statistics, not a limit applied to every individual noisy sample.
     public static final double STILL_GYRO_RAD_S = 0.045;
-    public static final double STILL_ACCEL_DELTA = 0.18;
-    public static final double STILL_ACCEL_STD = 0.07;
+    public static final double STILL_GYRO_STD = 0.025;
+    public static final double STILL_ACCEL_STD = 0.12;
+    public static final double CALIBRATION_MAX_GYRO_RAD_S = 0.35;
+    public static final double CALIBRATION_ACCEL_NORM_ERROR = 0.6;
+    public static final double CALIBRATION_MAX_TILT_RAD = Math.toRadians(2);
     public static final double MAX_ACCEL_BIAS = 0.5;
     public static final double G_RANGE = 2.0;
     public static final int HUD_WIDTH = 480, HUD_HEIGHT = 400;

@@ -1,8 +1,5 @@
-test_activity_launch_error_still_collects_logs (__main__.CaptureTests.test_activity_launch_error_still_collects_logs) ... ok
-test_immediate_process_exit_still_collects_logs (__main__.CaptureTests.test_immediate_process_exit_still_collects_logs) ... ok
-test_install_failure_is_saved (__main__.CaptureTests.test_install_failure_is_saved) ... ok
-
-----------------------------------------------------------------------
-Ran 3 tests in 0.474s
-
-OK
+2026-09-19 UTC — python3 tools/test-debug-device.py
+PASS test_activity_launch_error_still_collects_logs
+PASS test_immediate_process_exit_still_collects_logs
+PASS test_install_failure_is_saved
+Ran 3 tests. OK. Synthetic ADB only; no hardware attached.

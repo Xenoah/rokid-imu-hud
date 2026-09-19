@@ -17,10 +17,22 @@ public final class HudRenderer {
         boolean calibration=s.status==Snapshot.Status.CALIBRATING||s.status==Snapshot.Status.WAIT_STILL;
         if(calibration||s.status==Snapshot.Status.SENSOR_ERROR) {
             trailCount=0;
-            String message=s.status==Snapshot.Status.SENSOR_ERROR?"SENSOR UNAVAILABLE":calibration&&s.status==Snapshot.Status.WAIT_STILL?"WAITING FOR STILL":"CALIBRATING";
-            c.text(message,45,174,25,255);
+            String message=s.status==Snapshot.Status.SENSOR_ERROR?"SENSOR UNAVAILABLE":s.status==Snapshot.Status.WAIT_STILL?"CALIBRATION WAIT":"CALIBRATING";
+            c.text(message,240-message.length()*7.5f,174,25,255);
             c.text(s.status==Snapshot.Status.SENSOR_ERROR?"RESTART HUD":"KEEP HEAD STILL",98,205,20,230);
             c.line(100,229,380,229,2,100);c.line(100,229,(float)(100+280*s.progress),229,3,255);
+            if(calibration){
+                String reason=calibrationMessage(s.calibrationReason);
+                c.text(reason,240-reason.length()*5.1f,261,17,255);
+                c.text("ACC",55,290,13,190);
+                number(c,Math.sqrt(s.ax*s.ax+s.ay*s.ay+s.az*s.az)/Config.G,2,95,290,17,false);
+                c.text("G",151,290,13,190);c.text("GYRO",225,290,13,190);
+                number(c,Math.toDegrees(Math.sqrt(s.gx*s.gx+s.gy*s.gy+s.gz*s.gz)),2,283,290,17,false);
+                c.text("D/S",354,290,13,190);
+                c.text("A",55,316,13,190);number(c,s.accHz,0,75,316,15,false);
+                c.text("G",140,316,13,190);number(c,s.gyroHz,0,160,316,15,false);
+                c.text("HZ",210,316,13,190);c.text(s.nativePose?"OS QUAT":"IMU FUSION",281,316,13,190);
+            }
         } else if(!fresh) {
             c.text("IMU STALE",155,184,25,255);
             c.text("WAIT FOR SENSOR DATA",108,214,17,210);
@@ -41,6 +53,18 @@ public final class HudRenderer {
         c.text("2-FINGER DOUBLE: ZERO",18,383,12,180);
         c.text("TAP: MODE",365,383,12,180);
         c.restore();
+    }
+    private static String calibrationMessage(Snapshot.CalibrationReason reason){
+        switch(reason){
+            case WAIT_GYRO:return "WAITING FOR GYRO";
+            case POSE_DELAY:return "WAITING FOR ATTITUDE";
+            case GYRO_MOVING:return "LAST: ROTATION DETECTED";
+            case ACCEL_MOVING:return "LAST: MOTION / VIBRATION";
+            case ACCEL_SCALE:return "CHECK ACCEL SIGNAL";
+            case POSE_MISMATCH:return "SWITCHING TO IMU FUSION";
+            case ACCEL_BIAS:return "ACCEL OFFSET TOO HIGH";
+            default:return "SAMPLING - KEEP STILL";
+        }
     }
     private void horizon(HudCanvas c,Snapshot s,boolean solo) {
         float cy=solo?206:164;

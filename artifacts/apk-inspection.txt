@@ -6,9 +6,9 @@ PASS: DEX SHA-1 and Adler-32 integrity
 PASS: Launcher, sensor, render, fusion and engine implementations in DEX
 PASS: No Android stubs, desktop preview, or test classes packaged
 PASS: No undeclared desugared Java library dependency
-INFO: 36 DEX classes, 363 methods, 53512 bytes
+INFO: 39 DEX classes, 386 methods, 59948 bytes
 PASS: Manifest launcher resolves to the actual DEX class
 PASS: Android 12 minimum; target 35; debug logging access enabled
 PASS: No Internet, Bluetooth, or other requested permissions
 RESULT: 11 static APK checks passed. Device execution: NOT RUN.
-SHA256: aa953349e2640bbd70adb09d4179c70e785de0cb45fef6de5747323db1bc6bad
+SHA256: 8283fd744c55dae56187b76badccf0f0d2632691b707c535040f3e34ddf390bd

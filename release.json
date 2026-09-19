@@ -1,11 +1,14 @@
 {
-  "tag": "v0.1.1-preview",
-  "title": "0.1.1-preview — 起動時の画面初期化を修正 / Fix startup window initialization",
+  "tag": "v0.1.2-preview",
+  "title": "0.1.2-preview — 静止判定と校正診断を改善 / Improve stillness detection and calibration diagnostics",
   "prerelease": true,
-  "notes": "docs/releases/v0.1.1-preview.md",
-  "apk": "dist/RokidHUD-0.1.1-debug.apk",
-  "apk_sha256": "aa953349e2640bbd70adb09d4179c70e785de0cb45fef6de5747323db1bc6bad",
+  "notes": "docs/releases/v0.1.2-preview.md",
+  "apk": "dist/RokidHUD-0.1.2-debug.apk",
+  "apk_sha256": "8283fd744c55dae56187b76badccf0f0d2632691b707c535040f3e34ddf390bd",
   "images": [
-    "artifacts/hud-combined-480x400.png"
+    "artifacts/hud-combined-480x400.png",
+    "artifacts/hud-calibration-wait-480x400.png",
+    "docs/screenshots/phone-hud-0.1.2.png",
+    "docs/screenshots/glasses-calibration-0.1.2.jpg"
   ]
 }

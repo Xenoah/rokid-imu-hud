@@ -20,9 +20,10 @@ final class SensorController implements SensorEventListener {
     private final AxisMap axes=new AxisMap(1,2,3); // Official bare-metal axes. Change only after real-axis verification.
     private final Vec3 vector=new Vec3();
     private final Quat quaternion=new Quat();
+    private final Snapshot diagnostic=new Snapshot();
     private HudEngine engine;
     private Sensor poseSensor,accSensor,gyroSensor;
-    private long started,lastPose,lastAccel,lastGyro,recenterAt,unreliableSince;
+    private long started,lastPose,lastAccel,lastGyro,recenterAt,unreliableSince,lastCalibrationLog;
     private boolean running,forceFusion,sensorFault;
     private int mode=1;
     SensorController(Context context,Exchange exchange,boolean forceFusion) {
@@ -32,7 +33,7 @@ final class SensorController implements SensorEventListener {
     }
     void start(){handler.post(()->{
         if(running)return;running=true;started=SystemClock.elapsedRealtimeNanos();
-        lastPose=0;lastAccel=0;lastGyro=0;recenterAt=0;unreliableSince=0;sensorFault=false;
+        lastPose=0;lastAccel=0;lastGyro=0;recenterAt=0;unreliableSince=0;lastCalibrationLog=0;sensorFault=false;
         engine=new HudEngine(exchange,started);engine.setMode(mode);
         Diagnostics.sensors(manager);
         accSensor=manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -61,6 +62,10 @@ final class SensorController implements SensorEventListener {
     private final Runnable watchdog=new Runnable(){public void run(){
         if(!running)return;
         long now=SystemClock.elapsedRealtimeNanos();
+        if(poseSensor!=null&&engine.nativePoseRejected()){
+            manager.unregisterListener(SensorController.this,poseSensor);poseSensor=null;
+            Log.w(Diagnostics.TAG,"Native quaternion rejected: "+engine.nativeFailureReason()+"; using raw IMU fusion");
+        }
         if(poseSensor!=null&&now-started>2_000_000_000L&&(lastPose==0||now-lastPose>Config.FRESH_NS
                 ||(unreliableSince!=0&&now-unreliableSince>2_000_000_000L))){
             manager.unregisterListener(SensorController.this,poseSensor);poseSensor=null;engine.useFallback(now);
@@ -69,6 +74,16 @@ final class SensorController implements SensorEventListener {
         boolean missing=now-started>3_000_000_000L&&(now-lastAccel>2_000_000_000L||now-lastGyro>2_000_000_000L);
         if(missing&&!sensorFault){sensorFault=true;engine.error(now);Log.e(Diagnostics.TAG,"IMU stream stopped");}
         else if(!missing&&sensorFault){sensorFault=false;engine.requestRecenter(now);Log.i(Diagnostics.TAG,"IMU recovered; recalibration required");}
+        exchange.read(diagnostic);
+        if((diagnostic.status==Snapshot.Status.CALIBRATING||diagnostic.status==Snapshot.Status.WAIT_STILL)
+            &&now-lastCalibrationLog>=3_000_000_000L){
+            lastCalibrationLog=now;
+            Log.i(Diagnostics.TAG,"calibration reason="+diagnostic.calibrationReason+" progress="+diagnostic.progress
+                +" accHz="+diagnostic.accHz+" gyroHz="+diagnostic.gyroHz+" poseHz="+diagnostic.attHz
+                +" accNorm="+Math.sqrt(diagnostic.ax*diagnostic.ax+diagnostic.ay*diagnostic.ay+diagnostic.az*diagnostic.az)
+                +" gyroNorm="+Math.sqrt(diagnostic.gx*diagnostic.gx+diagnostic.gy*diagnostic.gy+diagnostic.gz*diagnostic.gz)
+                +" accStd="+diagnostic.calibrationAccStd+" gyroStd="+diagnostic.calibrationGyroStd);
+        }
         handler.postDelayed(this,500);
     }};
     void stop(){handler.post(()->{running=false;manager.unregisterListener(this);handler.removeCallbacks(watchdog);});}

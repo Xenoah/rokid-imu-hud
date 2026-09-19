@@ -1,5 +1,11 @@
 # Changelog / 変更履歴
 
+## [v0.1.2-preview](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.2-preview)
+
+時間窓の統計による静止判定、低頻度のOS姿勢への対応、重力と整合しない姿勢の棄却を追加。待機理由、ACC、GYRO、取得Hzを表示します。
+
+Uses windowed statistics for stillness detection, tolerates slower OS attitude updates, and rejects attitude inconsistent with gravity. Displays the wait reason, accelerometer, gyroscope and measured sample rates.
+
 ## [v0.1.1-preview](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.1-preview)
 
 DecorView生成前のInsetsController参照を避け、View生成後にシステムバーを設定するよう修正。起動失敗時のログ採取も改善しました。

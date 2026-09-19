@@ -1,0 +1,6 @@
+FAIL	20Hz OS attitude with 200Hz accel/gyro can finish calibration: stationary asynchronous streams never became READY
+FAIL	Stationary 0.08m/s2 per-axis noise does not repeatedly erase calibration: stationary noise never became READY
+FAIL	Inconsistent OS gravity frame recovers through raw IMU fusion: inconsistent OS quaternion causes endless calibration
+CALIBRATION RESULT	0 passed; 3 failed (synthetic only)
+Exception in thread "main" java.lang.AssertionError: 3 calibration regressions failed
+	at dev.xenoah.hud.core.CalibrationTests.main(CalibrationTests.java:49)

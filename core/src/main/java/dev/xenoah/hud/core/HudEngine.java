@@ -3,44 +3,53 @@ package dev.xenoah.hud.core;
 /** Single-writer engine. All event times use the Android elapsedRealtimeNanos clock. */
 public final class HudEngine {
     private final Fusion fusion=new Fusion();
-    private final Quat pose=new Quat(),reference=new Quat(),candidate=new Quat();
+    private final Quat pose=new Quat(),reference=new Quat(),candidate=new Quat(),calibrationPose=new Quat();
     private final Vec3 acc=new Vec3(),gyro=new Vec3(),up=new Vec3(),world=new Vec3(),ref=new Vec3();
-    private final Vec3 accBias=new Vec3(),gyroBias=new Vec3(),anchor=new Vec3();
-    private final Vec3 sumAcc=new Vec3(),sumGyro=new Vec3(),sumGravity=new Vec3();
-    private final Vec3 sumSquare=new Vec3();
+    private final Vec3 accBias=new Vec3(),gyroBias=new Vec3(),candidateBias=new Vec3();
+    private final Vec3 sumGravity=new Vec3();
+    private final RunningStats3 accStats=new RunningStats3(),gyroStats=new RunningStats3();
     private final Rate accRate=new Rate(),gyroRate=new Rate(),poseRate=new Rate();
     private final Snapshot out=new Snapshot();
-    private long accTime,gyroTime,nativeTime,poseTime,filterTime,calStart,stillStart,noticeUntil;
-    private int accCount,gyroCount;
+    private long accTime,gyroTime,nativeTime,poseTime,filterTime,calStart,noticeUntil;
     private double refPitch,refRoll;
     private boolean nativeActive,initialized,calibrating=true,hasReference,recenter;
+    private boolean nativeRejected;
+    private Snapshot.CalibrationReason nativeFailure=Snapshot.CalibrationReason.COLLECTING;
     private final Exchange exchange;
 
     public HudEngine(Exchange exchange,long now) { this.exchange=exchange;calStart=now; publish(now); }
 
     /** OS world up is +Z; fallback world up is +Y. Keep the two world frames separate. */
     public void onRotation(long t,double w,double x,double y,double z) {
-        if(t<=nativeTime||!candidate.set(w,x,y,z).normalize()) return;
+        if(nativeRejected||t<=nativeTime||!candidate.set(w,x,y,z).normalize()) return;
         nativeTime=t;poseRate.add(t);
         if(!nativeActive) {
             nativeActive=true;
-            requestRecenter(t); // Never reuse a reference from a different world frame.
-            recenter=hasReference;
+            beginCalibration(t); // Never mix calibration samples from different world frames.
         }
         pose.set(candidate);poseTime=t;initialized=true;
+        if(!calibrating)advanceNativePose(Math.max(t,gyroTime));
         updateTilt(0);publish(t);
     }
     public void useFallback(long now) {
         if(!nativeActive) return;
         nativeActive=false;initialized=false;nativeTime=0;
-        requestRecenter(now);
+        beginCalibration(now);
     }
+    private void rejectNative(long now,Snapshot.CalibrationReason why){
+        nativeRejected=true;nativeFailure=why;useFallback(now);
+        out.calibrationReason=why;publish(now);
+    }
+    public boolean nativePoseRejected(){return nativeRejected;}
+    public Snapshot.CalibrationReason nativeFailureReason(){return nativeFailure;}
     public void onGyro(long t,double x,double y,double z) {
         if(t<=gyroTime||!Double.isFinite(x)||!Double.isFinite(y)||!Double.isFinite(z))return;
         double dt=gyroTime==0?0:(t-gyroTime)*1e-9;
         gyroTime=t;gyro.set(x,y,z);gyroRate.add(t);
-        if(calibrating) { sumGyro.x+=x;sumGyro.y+=y;sumGyro.z+=z;gyroCount++; }
-        if(!nativeActive&&initialized&&dt>0&&dt<0.1&&t-accTime<Config.FRESH_NS) {
+        if(calibrating)gyroStats.add(t,x,y,z);
+        if(nativeActive&&!calibrating){
+            if(advanceNativePose(t))updateTilt(0);
+        }else if(!nativeActive&&initialized&&dt>0&&dt<0.1&&t-accTime<Config.FRESH_NS) {
             fusion.update(gyro,gyroBias,acc,accBias,dt);pose.set(fusion.q);poseTime=t;
             updateTilt(dt);
         } else if(!nativeActive&&dt>=0.1) { requestRecenter(t);initialized=false; }
@@ -53,7 +62,9 @@ public final class HudEngine {
             fusion.q.alignGravity(acc);pose.set(fusion.q);poseTime=t;initialized=true;
         }
         if(calibrating) { calibrate(t);publish(t);return; }
-        if(t-gyroTime>Config.FRESH_NS||Math.abs(t-poseTime)>Config.MAX_PAIR_SKEW_NS) {
+        if(nativeActive)advanceNativePose(t);
+        if(Math.abs(t-gyroTime)>Config.FRESH_NS||Math.abs(t-poseTime)>Config.MAX_PAIR_SKEW_NS
+            ||(nativeActive&&Math.abs(t-nativeTime)>Config.MAX_POSE_PREDICTION_NS)) {
             out.valid=false;publish(t);return;
         }
         // Remove estimated DEVICE-frame bias BEFORE rotation (bias follows the sensor).
@@ -72,48 +83,90 @@ public final class HudEngine {
     }
     public void requestRecenter(long now) {
         if(calibrating&&now-calStart<250_000_000L)return;
+        beginCalibration(now);
+    }
+    private void beginCalibration(long now){
         calibrating=true;calStart=now;recenter=hasReference;resetWindow();
         out.status=Snapshot.Status.CALIBRATING;out.valid=false;out.progress=0;
+        out.calibrationReason=Snapshot.CalibrationReason.COLLECTING;
         publish(now);
     }
     private void resetWindow() {
-        stillStart=0;accCount=0;gyroCount=0;
-        sumAcc.set(0,0,0);sumGyro.set(0,0,0);sumGravity.set(0,0,0);sumSquare.set(0,0,0);
+        accStats.clear();gyroStats.clear();sumGravity.set(0,0,0);out.progress=0;
     }
     private void calibrate(long t) {
-        if(!initialized||Math.abs(t-gyroTime)>Config.MAX_PAIR_SKEW_NS
-            ||(nativeActive&&Math.abs(t-nativeTime)>Config.MAX_PAIR_SKEW_NS)) {resetWindow();return;}
+        // Calibration averages independent streams. Do not apply the live G-meter's
+        // tight pairing gate here: a legitimate 20Hz OS pose otherwise restarts forever.
+        if(gyroTime==0||Math.abs(t-gyroTime)>Config.FRESH_NS){
+            resetWindow();out.calibrationReason=Snapshot.CalibrationReason.WAIT_GYRO;return;
+        }
+        if(nativeActive&&Math.abs(t-nativeTime)>Config.FRESH_NS){
+            rejectNative(t,Snapshot.CalibrationReason.POSE_DELAY);return;
+        }
         double n=acc.norm();
-        double dx=acc.x-anchor.x,dy=acc.y-anchor.y,dz=acc.z-anchor.z;
-        boolean still=gyro.norm()<Config.STILL_GYRO_RAD_S&&Math.abs(n-Config.G)<0.6
-            &&(stillStart==0||Math.sqrt(dx*dx+dy*dy+dz*dz)<Config.STILL_ACCEL_DELTA);
-        if(!still){resetWindow();out.progress=0;return;}
-        if(stillStart==0){stillStart=t;anchor.set(acc);}
-        sumAcc.x+=acc.x;sumAcc.y+=acc.y;sumAcc.z+=acc.z;
-        sumSquare.x+=acc.x*acc.x;sumSquare.y+=acc.y*acc.y;sumSquare.z+=acc.z*acc.z;
+        if(Math.abs(n-Config.G)>Config.CALIBRATION_ACCEL_NORM_ERROR){
+            resetWindow();out.calibrationReason=Snapshot.CalibrationReason.ACCEL_SCALE;return;
+        }
+        if(!initialized){resetWindow();out.calibrationReason=Snapshot.CalibrationReason.POSE_DELAY;return;}
+        if(gyro.norm()>Config.CALIBRATION_MAX_GYRO_RAD_S){
+            resetWindow();out.calibrationReason=Snapshot.CalibrationReason.GYRO_MOVING;return;
+        }
+        // Reject sustained rotation early, using a short mean rather than one noisy sample.
+        // This prevents an old moving interval from delaying recovery after the head stops.
+        if(gyroStats.count>=5&&gyroTime-gyroStats.firstNs>=Config.CALIBRATION_MOTION_WINDOW_NS
+            &&gyroStats.mean.norm()>Config.STILL_GYRO_RAD_S){
+            resetWindow();out.calibrationReason=Snapshot.CalibrationReason.GYRO_MOVING;return;
+        }
+        if(accStats.count==0)calibrationPose.set(pose);
+        accStats.add(t,acc.x,acc.y,acc.z);
         pose.inverseRotate(0,nativeActive?0:Config.G,nativeActive?Config.G:0,up);
         sumGravity.x+=up.x;sumGravity.y+=up.y;sumGravity.z+=up.z;
-        accCount++;out.progress=Math.min(1,(t-stillStart)/(double)Config.CALIBRATION_NS);
-        if(t-stillStart<Config.CALIBRATION_NS||accCount<30||gyroCount<30)return;
-        double ax=sumAcc.x/accCount,ay=sumAcc.y/accCount,az=sumAcc.z/accCount;
-        double variance=Math.max(0,sumSquare.x/accCount-ax*ax)
-            +Math.max(0,sumSquare.y/accCount-ay*ay)+Math.max(0,sumSquare.z/accCount-az*az);
-        if(variance>3*Config.STILL_ACCEL_STD*Config.STILL_ACCEL_STD){resetWindow();return;}
-        gyroBias.set(sumGyro.x/gyroCount,sumGyro.y/gyroCount,sumGyro.z/gyroCount);
-        if(nativeActive) accBias.set(ax-sumGravity.x/accCount,ay-sumGravity.y/accCount,az-sumGravity.z/accCount);
+        long start=Math.max(accStats.firstNs,gyroStats.firstNs);
+        out.progress=Math.min(1,(t-start)/(double)Config.CALIBRATION_NS);
+        out.calibrationAccStd=Math.sqrt(accStats.varianceSum());
+        out.calibrationGyroStd=Math.sqrt(gyroStats.varianceSum());
+        if(t-start<Config.CALIBRATION_NS||accStats.count<Config.CALIBRATION_MIN_SAMPLES
+            ||gyroStats.count<Config.CALIBRATION_MIN_SAMPLES)return;
+        if(gyroStats.mean.norm()>Config.STILL_GYRO_RAD_S
+            ||gyroStats.varianceSum()>3*Config.STILL_GYRO_STD*Config.STILL_GYRO_STD){
+            resetWindow();out.calibrationReason=Snapshot.CalibrationReason.GYRO_MOVING;return;
+        }
+        double dot=Math.abs(pose.w*calibrationPose.w+pose.x*calibrationPose.x
+            +pose.y*calibrationPose.y+pose.z*calibrationPose.z);
+        if(accStats.varianceSum()>3*Config.STILL_ACCEL_STD*Config.STILL_ACCEL_STD
+            ||(nativeActive&&dot<Math.cos(Config.CALIBRATION_MAX_TILT_RAD/2))){
+            resetWindow();out.calibrationReason=Snapshot.CalibrationReason.ACCEL_MOVING;return;
+        }
+        double ax=accStats.mean.x,ay=accStats.mean.y,az=accStats.mean.z;
+        if(nativeActive)candidateBias.set(ax-sumGravity.x/accStats.count,
+            ay-sumGravity.y/accStats.count,az-sumGravity.z/accStats.count);
         else {
             // One stationary pose cannot identify transverse accelerometer bias independently
             // of tilt. Only radial residual is observable without an external attitude reference.
             double norm=Math.sqrt(ax*ax+ay*ay+az*az),k=1-Config.G/norm;
-            accBias.set(ax*k,ay*k,az*k);
-            fusion.q.alignGravity(anchor.set(ax,ay,az));pose.set(fusion.q);poseTime=t;
+            candidateBias.set(ax*k,ay*k,az*k);
         }
-        if(accBias.norm()>Config.MAX_ACCEL_BIAS){resetWindow();out.status=Snapshot.Status.WAIT_STILL;return;}
+        if(candidateBias.norm()>Config.MAX_ACCEL_BIAS){
+            if(nativeActive)rejectNative(t,Snapshot.CalibrationReason.POSE_MISMATCH);
+            else{resetWindow();out.calibrationReason=Snapshot.CalibrationReason.ACCEL_BIAS;}
+            return;
+        }
+        // Commit biases only after every quality check passes.
+        gyroBias.set(gyroStats.mean);accBias.set(candidateBias);
+        if(!nativeActive){fusion.q.alignGravity(accStats.mean);pose.set(fusion.q);poseTime=t;}
         reference.set(pose);readTilt();refPitch=out.pitch;refRoll=out.roll;
         out.pitch=0;out.roll=0;out.lat=0;out.longitudinal=0;out.rawLat=0;out.rawLong=0;out.peak=0;
         filterTime=t;calibrating=false;hasReference=true;out.valid=true;
         out.status=recenter?Snapshot.Status.RECENTERED:Snapshot.Status.READY;
+        out.calibrationReason=Snapshot.CalibrationReason.COMPLETE;
         noticeUntil=t+1_000_000_000L;
+    }
+    /** Short gyro extrapolation between accepted OS samples, never unbounded dead reckoning. */
+    private boolean advanceNativePose(long t){
+        if(!nativeActive||!initialized||t<=poseTime||t-nativeTime>Config.MAX_POSE_PREDICTION_NS
+            ||gyroTime==0||Math.abs(t-gyroTime)>Config.MAX_PAIR_SKEW_NS)return false;
+        pose.integrate(gyro.x-gyroBias.x,gyro.y-gyroBias.y,gyro.z-gyroBias.z,(t-poseTime)*1e-9);
+        poseTime=t;return true;
     }
     private void readTilt() {
         pose.inverseRotate(0,nativeActive?0:1,nativeActive?1:0,up);
@@ -138,6 +191,7 @@ public final class HudEngine {
         out.timeNs=t;out.accTimeNs=accTime;out.gyroTimeNs=gyroTime;out.attTimeNs=poseTime;
         out.accHz=accRate.hz;out.gyroHz=gyroRate.hz;out.attHz=nativeActive?poseRate.hz:gyroRate.hz;
         out.nativePose=nativeActive;out.gravityCorrection=!nativeActive&&fusion.correctionUsed;
+        out.nativeRejected=nativeRejected;
         out.ax=acc.x;out.ay=acc.y;out.az=acc.z;out.gx=gyro.x;out.gy=gyro.y;out.gz=gyro.z;
         out.abx=accBias.x;out.aby=accBias.y;out.abz=accBias.z;
         out.gbx=gyroBias.x;out.gby=gyroBias.y;out.gbz=gyroBias.z;

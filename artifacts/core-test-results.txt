@@ -16,3 +16,12 @@ PASS	Native to fallback switch forces a new reference
 PASS	Signed axis permutation transforms vectors and quaternion consistently
 PASS	Viewport preserves the requested 480x400 and official safe area
 RESULT	16 tests passed (synthetic data; no hardware attached)
+PASS	20Hz OS attitude with 200Hz accel/gyro can finish calibration
+PASS	Stationary 0.08m/s2 per-axis noise does not repeatedly erase calibration
+PASS	Inconsistent OS gravity frame recovers through raw IMU fusion
+PASS	20/25/50Hz attitude, reordered accel/gyro and noise calibrate
+PASS	Low-rate native attitude stays usable during pitch motion
+PASS	A stopped native source can fall back and finish calibration
+PASS	Missing gyro and wrong accelerometer scale cannot become READY
+PASS	Sustained vibration is rejected and calibration recovers after it stops
+CALIBRATION RESULT	8 passed; 0 failed (synthetic only)

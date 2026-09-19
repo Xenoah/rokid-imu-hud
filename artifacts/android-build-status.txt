@@ -1,13 +1,16 @@
 UPDATED 2026-09-19 UTC
-APK: 0.1.1 SIGNED_AND_VERIFIED
-Startup fix: remove pre-decor Window.getInsetsController access
-Same signing certificate as 0.1.0: CONFIRMED
+APK: 0.1.2 SIGNED_AND_VERIFIED
+Calibration: independent time-window statistics, bounded native-pose gyro extrapolation, rejection diagnostics
+Startup fix from 0.1.1: retained
+Same signing certificate as 0.1.0 / 0.1.1: CONFIRMED
 Build route: tools/build-apk.py (direct Android SDK tools)
 Android Java compilation: PASS (API 36 public stubs, target 35, min 31)
 DEX generation: PASS
 APK v3 signature and zip alignment: PASS
 APK static inspection: 11 checks PASS
-Core synthetic tests: 16 PASS
+Core synthetic tests: 24 PASS (16 existing, 8 calibration regressions)
+Production CSV formatter: PASS (32 columns)
+Fake-ADB failure capture tests: 3 PASS
 Gradle / Android lint: NOT RUN (Gradle download unavailable)
 Android runtime / Rokid physical device: NOT RUN (no runtime or device attached)
-Details: docs/apk-debug-report.md
+Details: docs/apk-debug-report.md and docs/calibration-fix-0.1.2.md
