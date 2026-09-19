@@ -1,13 +1,14 @@
 {
-  "tag": "v0.1.4-preview",
-  "title": "0.1.4-preview — 不安定なOS姿勢から自前融合へ復帰 / Recover from unstable OS attitude",
-  "prerelease": true,
-  "notes": "docs/releases/v0.1.4-preview.md",
-  "apk": "dist/RokidHUD-0.1.4-debug.apk",
-  "apk_sha256": "9833913816080e82404870b1d53e7387aec19a0d543e6d46dc35cb977a8f4f61",
+  "tag": "v0.1.5",
+  "title": "0.1.5 — 校正待機に10秒／15秒の上限動作を追加 / Bound calibration waiting with 10s / 15s fallback",
+  "prerelease": false,
+  "notes": "docs/releases/v0.1.5.md",
+  "apk": "dist/RokidHUD-0.1.5-debug.apk",
+  "apk_sha256": "8386e7300d7f301cbbc9d083773c9d7a39c89a6cbb5886002a7e4dc9715800c1",
   "images": [
     "artifacts/hud-combined-480x400.png",
     "artifacts/hud-calibration-wait-480x400.png",
+    "artifacts/hud-approximate-480x400.png",
     "docs/screenshots/phone-hud-0.1.2.png",
     "docs/screenshots/glasses-calibration-0.1.2.jpg"
   ]

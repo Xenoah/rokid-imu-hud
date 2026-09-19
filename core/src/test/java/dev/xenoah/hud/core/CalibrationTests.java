@@ -96,13 +96,13 @@ public final class CalibrationTests {
             check(!noGyro.s.valid&&noGyro.s.calibrationReason==Snapshot.CalibrationReason.WAIT_GYRO,"missing gyro must remain identified");
             check(!wrongScale.s.valid&&wrongScale.s.calibrationReason==Snapshot.CalibrationReason.ACCEL_SCALE,"wrong units must not be silently accepted");
         });
-        test("Sustained vibration is rejected and calibration recovers after it stops",()->{
+        test("Before relaxation, vibration is rejected and calibration recovers after it stops",()->{
             Input f=new Input();
-            for(int i=0;i<3300;i++){
+            for(int i=0;i<1600;i++){
                 f.t+=5_000_000L;f.engine.onRotation(f.t,f.base.w,f.base.x,f.base.y,f.base.z);
                 f.engine.onGyro(f.t,0,0,0);f.engine.onAccel(f.t,i%2==0?.4:-.4,Config.G,0);
             }
-            f.exchange.read(f.s);check(!f.s.valid&&f.s.status==Snapshot.Status.WAIT_STILL,"vibration cannot force READY at timeout");
+            f.exchange.read(f.s);check(!f.s.valid&&f.s.status==Snapshot.Status.CALIBRATING,"strict calibration rejects vibration before 10s");
             check(f.s.calibrationReason==Snapshot.CalibrationReason.ACCEL_MOVING,"vibration reason");
             Random r=new Random(111);for(int i=0;i<500&&!f.s.valid;i++)f.sample(i,1,.04,r,false);
             check(f.s.valid,"calibration recovers when vibration stops");

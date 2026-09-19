@@ -12,7 +12,18 @@ public final class Config {
     public static final double FUSION_NORM_GATE = 0.06;
     public static final double FUSION_ANGLE_GATE_RAD = Math.toRadians(2.5);
     public static final long CALIBRATION_NS = 1_000_000_000L;
+    public static final long CALIBRATION_RELAX_AFTER_NS = 10_000_000_000L;
     public static final long CALIBRATION_TIMEOUT_NS = 15_000_000_000L;
+    public static final long RELAXED_CALIBRATION_NS = 500_000_000L;
+    public static final double RELAXED_ACCEL_STD = 0.35;
+    public static final double RELAXED_GYRO_STD = 0.12;
+    public static final double RELAXED_MAX_TILT_RAD = Math.toRadians(6);
+    public static final double RELAXED_ACCEL_NORM_ERROR = 1.0;
+    public static final double RELAXED_MAX_GYRO_RAD_S = 0.60;
+    // A deadline may bypass stillness, never absent/non-finite/implausibly scaled data.
+    public static final double PROVISIONAL_MIN_ACCEL = 0.5 * G;
+    public static final double PROVISIONAL_MAX_ACCEL = 1.5 * G;
+    public static final double PROVISIONAL_MAX_GYRO = 20.0;
     public static final long FRESH_NS = 150_000_000L;
     public static final long MAX_PAIR_SKEW_NS = 30_000_000L;
     public static final long MAX_POSE_PREDICTION_NS = 100_000_000L;

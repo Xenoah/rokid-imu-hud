@@ -1,5 +1,6 @@
 package dev.xenoah.hud;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -71,9 +72,16 @@ public final class MainActivity extends Activity {
         IntentFilter filter=new IntentFilter();filter.addAction(RESET);filter.addAction(TAKE);filter.addAction(LEG);
         // Standard platform API; no AndroidX dependency. Firmware broadcasts originate outside app UID.
         if(Build.VERSION.SDK_INT>=33)registerReceiver(receiver,filter,Context.RECEIVER_EXPORTED);
-        else registerReceiver(receiver,filter);
+        else registerLegacyReceiver(filter);
         registered=true;updateRunning();
         Log.i(Diagnostics.TAG,"startup: resumed");
+    }
+    // Only called on API 31/32. The exported/not-exported flags were added in
+    // API 33; newer Android versions use the explicit RECEIVER_EXPORTED path.
+    // AGP 8.9.2 lint also flags this guarded legacy call for targetSdk 35.
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    private void registerLegacyReceiver(IntentFilter filter){
+        registerReceiver(receiver,filter);
     }
     private void updateRunning(){
         if(foreground&&worn&&open){getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);sensors.start();surface.resume();}

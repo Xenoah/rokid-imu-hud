@@ -28,17 +28,20 @@ public final class Preview implements HudCanvas {
     public void text(char[] s,int n,float x,float y,float size,int a){text(new String(s,0,n),x,y,size,a);}
     public static void main(String[] args)throws Exception{
         File dir=new File(args.length==0?"artifacts":args[0]);dir.mkdirs();
-        String[] names={"hud-combined-480x400","hud-level-480x400","hud-horizon-480x400","hud-gmeter-480x400","hud-safe-area-480x640","hud-calibrating-480x400","hud-stale-480x400","hud-calibration-wait-480x400"};
+        String[] names={"hud-combined-480x400","hud-level-480x400","hud-horizon-480x400","hud-gmeter-480x400","hud-safe-area-480x640","hud-calibrating-480x400","hud-stale-480x400","hud-calibration-wait-480x400","hud-approximate-480x400","hud-sensor-error-480x400"};
         for(int i=0;i<names.length;i++){
             int height=i==4?640:400;Preview p=new Preview(480,height);Snapshot s=new Snapshot();
             long now=5_000_000_000L;s.timeNs=now;s.accTimeNs=now;s.gyroTimeNs=now;s.attTimeNs=now;
-            s.status=Snapshot.Status.LIVE;s.valid=true;s.mode=i==2?2:i==3?3:1;
+            s.status=Snapshot.Status.LIVE;s.valid=true;s.calibrationQuality=Snapshot.CalibrationQuality.STANDARD;s.mode=i==2?2:i==3?3:1;
             s.roll=i==1?0:12.5;s.pitch=i==1?0:3.2;s.lat=i==1?0:.42;s.longitudinal=i==1?0:.71;s.peak=1.28;
             if(i==5||i==7){s.status=i==5?Snapshot.Status.CALIBRATING:Snapshot.Status.WAIT_STILL;s.valid=false;s.progress=.6;
                 s.ay=Config.G*.99;s.gx=Math.toRadians(3.69);s.accHz=198;s.gyroHz=198;s.nativePose=true;
+                s.calibrationQuality=Snapshot.CalibrationQuality.PENDING;s.calibrationElapsedSec=i==7?11.2:.6;s.calibrationRelaxed=i==7;
                 s.calibrationGyroMean=Math.toRadians(4.5);s.calibrationPoseRange=i==7?4.5:.4;s.calibrationTiltRange=.2;
-                if(i==7){s.nativePose=false;s.nativeRejected=true;s.calibrationReason=Snapshot.CalibrationReason.POSE_UNSTABLE;}}
+                if(i==7){s.nativePose=false;s.nativeRejected=true;s.calibrationReason=Snapshot.CalibrationReason.RELAXED_LIMITS;}}
             if(i==6)s.accTimeNs=now-1_000_000_000L;
+            if(i==8)s.calibrationQuality=Snapshot.CalibrationQuality.PROVISIONAL;
+            if(i==9){s.status=Snapshot.Status.SENSOR_ERROR;s.valid=false;s.calibrationQuality=Snapshot.CalibrationQuality.PENDING;s.calibrationReason=Snapshot.CalibrationReason.WAIT_ACCEL;}
             new HudRenderer().draw(p,s,now,480,height,false);
             ImageIO.write(p.image,"png",new File(dir,names[i]+".png"));p.g.dispose();
         }

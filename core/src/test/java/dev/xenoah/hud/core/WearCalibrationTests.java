@@ -63,9 +63,9 @@ public final class WearCalibrationTests {
             check(f.s.valid&&f.s.nativeRejected&&!f.s.nativePose,"raw keep-still assumption is explicit");
             f.engine.copyGyroBias(f.bias);near(f.bias.y,speed+.004,.002,"constant yaw can contaminate bias if user moves");
         });
-        test("Large out-and-back motion cannot hide behind equal endpoint poses",()->{
+        test("Before relaxation, out-and-back motion cannot hide behind equal endpoint poses",()->{
             Input f=new Input();double amp=Math.toRadians(4),frequency=2*Math.PI;
-            for(int i=0;i<3300;i++){
+            for(int i=0;i<1600;i++){
                 double time=i*.005;f.sample(i,1,true,amp*Math.sin(frequency*time),amp*frequency*Math.cos(frequency*time),0,false);
             }
             check(!f.s.valid,"large excursions must be checked throughout the window");

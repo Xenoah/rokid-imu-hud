@@ -26,8 +26,14 @@ jobs:
           java-version: '17'
       - name: Verify archived source and APK checksums
         run: sha256sum --check SHA256SUMS
-      - name: Run this version's IMU regression tests
-        run: sh tools/test-core.sh
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Install Android platform
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Require Gradle build, IMU regression tests and Android lint
+        run: ./gradlew :core:verify :app:assembleDebug :app:lintDebug --no-daemon
       - name: Publish APK, source, screenshots and bilingual notes
         env:
           GH_TOKEN: ${{ github.token }}

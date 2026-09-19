@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--serial')
 parser.add_argument('--apk', type=Path)
-parser.add_argument('--seconds', type=int, default=15)
+parser.add_argument('--seconds', type=int, default=20)
 parser.add_argument('--output', type=Path)
 parser.add_argument('--force-fusion', action='store_true')
 args = parser.parse_args()
@@ -97,7 +97,8 @@ try:
     rows = list(csv.DictReader(io.StringIO(capture.stdout))) if capture.returncode == 0 else []
     valid = [row for row in rows if row.get('valid') == 'true']
     result.update(process_survived=alive, csv_rows=len(rows), valid_rows=len(valid),
-                  native_attitude=valid[-1].get('native') if valid else None)
+                  native_attitude=valid[-1].get('native') if valid else None,
+                  calibration_quality=valid[-1].get('cal_quality') if valid else None)
     if not alive or 'FATAL EXCEPTION' in logs:
         raise RuntimeError('HUD process exited or crashed; inspect logcat.txt')
     result['status'] = 'RUNTIME_SMOKE_PASS' if valid else 'CALIBRATION_OR_SENSOR_CHECK_REQUIRED'

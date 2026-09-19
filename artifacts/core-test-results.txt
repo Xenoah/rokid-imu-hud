@@ -5,7 +5,7 @@ PASS	Forward braking and lateral acceleration
 PASS	Quaternion reference transform follows reset frame, not head local axes
 PASS	Pure yaw does not change horizon, even after a tilted reset
 PASS	Gravity removal with bias over random orientations
-PASS	Moving calibration is rejected and recovers when still
+PASS	Before relaxation, moving calibration is rejected and recovers when still
 PASS	4Hz filter: bounded delay and vibration attenuation
 PASS	Stale, reversed and NaN samples never masquerade as fresh
 METRIC	1h synthetic max tilt 0.008518 deg; max horizontal G 0.000837
@@ -23,22 +23,31 @@ PASS	20/25/50Hz attitude, reordered accel/gyro and noise calibrate
 PASS	Low-rate native attitude stays usable during pitch motion
 PASS	A stopped native source can fall back and finish calibration
 PASS	Missing gyro and wrong accelerometer scale cannot become READY
-PASS	Sustained vibration is rejected and calibration recovers after it stops
+PASS	Before relaxation, vibration is rejected and calibration recovers after it stops
 CALIBRATION RESULT	8 passed; 0 failed (synthetic only)
 PASS	Stable native pose with 3.69deg/s gyro offset can calibrate
 PASS	Sub-degree head sway above the old gyro threshold can calibrate
 PASS	Small slow real rotation is subtracted from the gyro bias estimate
 PASS	Calibrating during constant yaw demonstrates the documented six-axis ambiguity
-PASS	Large out-and-back motion cannot hide behind equal endpoint poses
+PASS	Before relaxation, out-and-back motion cannot hide behind equal endpoint poses
 PASS	Quaternion sign flips do not look like head motion
 PASS	Fallback estimates a bounded stable raw rate under the keep-still assumption
 PASS	A validated gyro offset survives native-to-fusion handover
 WEAR CALIBRATION RESULT	8 passed; 0 failed (synthetic only)
 PASS	Drifting OS pose cannot erase a quiet raw-IMU calibration window
 PASS	Raw fusion can estimate a stationary 4.5deg/s offset at startup
-PASS	Real pitch movement is rejected by measured gravity direction
+PASS	Before relaxation, real pitch movement is rejected by measured gravity direction
 PASS	Recovery waits for motion to stop, then completes without restarting the app
 PASS	Raw-path recenter re-estimates bias and clears peak and filters
 PASS	Calibration cannot count an accelerometer gap as quiet observation
 PASS	A stationary offset beyond the native limit can use raw calibration
 RECOVERY RESULT	7 passed; 0 failed (synthetic only)
+PASS	Normal startup keeps its one-second calibration and STANDARD quality
+PASS	Ten-second relaxation accepts bounded noise at 198 and 247Hz
+PASS	Persistent rotation starts provisionally at 15s without learning motion as bias
+PASS	Source switches cannot restart the calibration deadline
+PASS	No, stale, NaN or incorrectly scaled IMU terminates in an error instead of calibration
+PASS	RESET after approximate startup clears peak, filters and the APPROX quality
+PASS	A provisional recenter retains previously committed sensor biases
+PASS	Watchdog can start provisionally from fresh data without another accel event
+DEADLINE RESULT	8 passed; 0 failed (synthetic only)

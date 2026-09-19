@@ -12,16 +12,20 @@ public final class HudRenderer {
         c.clear();viewport.fit(width,height);c.save();c.translate(viewport.x,viewport.y);c.scale(viewport.scale);
         c.clip(0,0,480,400);
         c.text("ROKID / INERTIAL",18,23,13,190);
+        if(s.calibrationQuality==Snapshot.CalibrationQuality.RELAXED||s.calibrationQuality==Snapshot.CalibrationQuality.PROVISIONAL)
+            c.text("APPROX",257,23,12,255);
         c.text(s.mode==1?"HUD + G":s.mode==2?"HORIZON":"G METER",350,23,13,190);
         boolean fresh=s.fresh(now);
         boolean calibration=s.status==Snapshot.Status.CALIBRATING||s.status==Snapshot.Status.WAIT_STILL;
         if(calibration||s.status==Snapshot.Status.SENSOR_ERROR) {
             trailCount=0;
-            String message=s.status==Snapshot.Status.SENSOR_ERROR?"SENSOR UNAVAILABLE":s.status==Snapshot.Status.WAIT_STILL?"CALIBRATION WAIT":"CALIBRATING";
+            String message=s.status==Snapshot.Status.SENSOR_ERROR?"IMU DATA ERROR":s.calibrationRelaxed?"EASY CALIBRATION":"CALIBRATING";
             c.text(message,240-message.length()*7.5f,174,25,255);
-            c.text(s.status==Snapshot.Status.SENSOR_ERROR?"RESTART HUD":"KEEP HEAD STILL",98,205,20,230);
-            c.line(100,229,380,229,2,100);c.line(100,229,(float)(100+280*s.progress),229,3,255);
+            c.text(s.status==Snapshot.Status.SENSOR_ERROR?"CHECK IMU / RESET":"KEEP HEAD STILL",s.status==Snapshot.Status.SENSOR_ERROR?78:98,205,20,230);
             if(calibration){
+                c.text("ELAPSED",113,131,13,190);number(c,s.calibrationElapsedSec,1,179,131,15,false);
+                c.text("S / 15S MAX",226,131,13,190);
+                c.line(100,229,380,229,2,100);c.line(100,229,(float)(100+280*s.progress),229,3,255);
                 String reason=calibrationMessage(s.calibrationReason);
                 c.text(reason,240-reason.length()*5.1f,261,17,255);
                 c.text("ACC",55,290,13,190);
@@ -39,6 +43,9 @@ public final class HudRenderer {
                 number(c,s.calibrationTiltRange,1,283,339,15,false);c.text("DEG",354,339,13,190);
                 c.text("GYRO MEAN",55,360,12,190);
                 number(c,Math.toDegrees(s.calibrationGyroMean),2,147,360,13,false);c.text("D/S",209,360,12,190);
+            }else{
+                String reason=calibrationMessage(s.calibrationReason);
+                c.text(reason,240-reason.length()*5.1f,261,17,230);
             }
         } else if(!fresh) {
             c.text("IMU STALE",155,184,25,255);
@@ -64,6 +71,7 @@ public final class HudRenderer {
     private static String calibrationMessage(Snapshot.CalibrationReason reason){
         switch(reason){
             case WAIT_GYRO:return "WAITING FOR GYRO";
+            case WAIT_ACCEL:return "NO FRESH ACCEL DATA";
             case POSE_DELAY:return "WAITING FOR ATTITUDE";
             case GYRO_MOVING:return "LAST: ROTATION DETECTED";
             case ATTITUDE_MOVING:return "LAST: ATTITUDE CHANGED";
@@ -73,6 +81,8 @@ public final class HudRenderer {
             case POSE_MISMATCH:return "SWITCHING TO IMU FUSION";
             case POSE_UNSTABLE:return "OS UNSTABLE - IMU CAL";
             case ACCEL_BIAS:return "ACCEL OFFSET TOO HIGH";
+            case RELAXED_LIMITS:return "LOOSER MOTION LIMITS";
+            case DEADLINE:return "APPROXIMATE REFERENCE";
             default:return "SAMPLING - KEEP STILL";
         }
     }

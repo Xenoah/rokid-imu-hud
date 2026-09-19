@@ -54,14 +54,14 @@ public final class RecoveryCalibrationTests {
             check(f.s.valid&&!f.s.nativePose,"raw mean was incorrectly treated as movement before bias estimation");
             f.engine.copyGyroBias(f.bias);near(f.bias.y,bias,.001,"raw offset");
         });
-        test("Real pitch movement is rejected by measured gravity direction",()->{
+        test("Before relaxation, real pitch movement is rejected by measured gravity direction",()->{
             for(boolean os:new boolean[]{false,true}){
                 Input f=new Input();double speed=Math.toRadians(4.5);
-                for(int i=0;i<4000;i++){
+                for(int i=0;i<1900;i++){
                     double angle=speed*i/247;f.body.axis(1,0,0,angle);f.body.inverseRotate(0,Config.G,0,f.acc);
                     f.sample(0,angle,speed,f.acc.x,f.acc.y,f.acc.z,247,os);
                 }
-                check(!f.s.valid&&f.s.status==Snapshot.Status.WAIT_STILL,"tilt must not become gyro bias os="+os);
+                check(!f.s.valid&&f.s.status==Snapshot.Status.CALIBRATING,"tilt must not become gyro bias os="+os);
             }
         });
         test("Recovery waits for motion to stop, then completes without restarting the app",()->{

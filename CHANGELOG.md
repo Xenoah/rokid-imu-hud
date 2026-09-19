@@ -1,5 +1,11 @@
 # Changelog / 変更履歴
 
+## [v0.1.5](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.5)
+
+通常は約1秒で校正。10秒で静止判定を緩和し、15秒でも未完了なら新鮮で妥当なIMU入力から暫定基準でHUDを開始します。緩和・暫定開始はAPPROXと表示。欠測や不正入力ではIMU DATA ERRORを表示し、無期限に校正を続けません。
+
+Normally calibrates in about one second. Relaxes stillness criteria after 10 seconds and starts with a provisional reference after 15 seconds if fresh, plausible IMU input is available. Relaxed/provisional results display APPROX. Missing or invalid input produces IMU DATA ERROR instead of waiting indefinitely.
+
 ## [v0.1.4-preview](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.4-preview)
 
 OS姿勢だけの変化で生IMUの集計窓を消去しないように変更。不安定なOS姿勢は棄却し、本体の加速度・ジャイロによる融合へ切り替えます。

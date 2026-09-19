@@ -1,20 +1,19 @@
 UPDATED 2026-09-19 UTC
-APK: 0.1.4 SIGNED_AND_VERIFIED
-Calibration: raw statistics and gravity-direction gate independent of native quaternion movement; unstable native source switches to raw Mahony calibration
-Raw stationary gyro bias bound: 0.15 rad/s; keep-head-still assumption is required
-Known limit: constant yaw and constant gyro offset cannot be distinguished using six axes alone
-Previous fixes: sparse native attitude, stationary noise, startup ordering retained
-Same signing certificate as 0.1.0 / 0.1.1 / 0.1.2 / 0.1.3: CONFIRMED
+APK: 0.1.5 SIGNED_AND_VERIFIED
+Calibration: ordinary 1s window; relax after 10s; provisional start at 15s with fresh plausible raw IMU
+Deadline survives source changes and calibration-window resets; no-data and invalid-scale cases terminate in SENSOR_ERROR
+Quality: STANDARD / RELAXED / PROVISIONAL; latter two show persistent APPROX marker until ordinary RESET succeeds
+Provisional start retains committed biases and never learns arbitrary movement as a new bias
+Same signing certificate as 0.1.0 through 0.1.4: CONFIRMED
 Build route: tools/build-apk.py (direct Android SDK tools)
 Android Java compilation: PASS (API 36 public stubs, target 35, min 31)
 DEX generation: PASS
 APK v3 signature and zip alignment: PASS
-APK static inspection: 11 checks PASS (41 classes, 394 methods)
-Core synthetic tests: 39 PASS (2 prior constant-yaw tests revised to document the keep-still assumption; 7 new recovery cases)
-0.1.3 baseline with new recovery tests: 1 PASS / 6 FAIL, as expected
-Production CSV formatter: PASS (35 columns)
-Fake-ADB failure capture: 3 prior tests PASS (helper unchanged)
-User video of 0.1.3: HUD rendered, ACC/GYRO approximately 247Hz, repeated calibration waiting
-Gradle / Android lint: NOT RUN (Gradle download unavailable)
-0.1.4 Android runtime / Rokid physical device: NOT RUN (no runtime or device attached)
-Details: docs/apk-debug-report.md and docs/calibration-fix-0.1.4.md
+APK static inspection: 11 checks PASS (42 classes, 407 methods)
+Core synthetic tests: 47 PASS (8 new deadline cases; 4 older motion-rejection cases limited to ordinary 0-10s calibration per requested behavior change)
+Production CSV formatter: PASS (38 columns; provisional quality preserved)
+Fake-ADB failure capture: 3 tests PASS; default runtime capture now 20s with quality included in result JSON
+Production renderer via Java2D: 10 previews; relaxed, approximate HUD and sensor error visually reviewed
+Gradle / Android lint: required GitHub Actions gate before stable publication (local Gradle download unavailable)
+0.1.5 Android runtime / Rokid physical device: NOT RUN (no runtime or device attached)
+Details: docs/apk-debug-report.md and docs/calibration-fix-0.1.5.md

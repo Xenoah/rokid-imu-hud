@@ -75,13 +75,13 @@ public final class CoreTests {
                 f.nativeSamples(10,0,0,0);near(f.s.rawLat,0,1e-6,"gravity lat");near(f.s.rawLong,0,1e-6,"gravity long");
             }
         });
-        test("Moving calibration is rejected and recovers when still",()->{
+        test("Before relaxation, moving calibration is rejected and recovers when still",()->{
             Fixture f=new Fixture();f.pose(0,0,0);
-            for(int i=0;i<3300;i++){
+            for(int i=0;i<1600;i++){
                 f.t+=5_000_000L;f.engine.onRotation(f.t,f.nativeQ.w,f.nativeQ.x,f.nativeQ.y,f.nativeQ.z);
                 f.engine.onGyro(f.t,.2,0,0);f.engine.onAccel(f.t,0,Config.G,0);
             }
-            f.exchange.read(f.s);check(!f.s.valid,"movement cannot mark ready");check(f.s.status==Snapshot.Status.WAIT_STILL,"wait status after timeout");
+            f.exchange.read(f.s);check(!f.s.valid,"movement cannot mark ready");check(f.s.status==Snapshot.Status.CALIBRATING,"ordinary calibration before relaxation");
             f.nativeSamples(230,0,0,0);check(f.s.valid,"recovers after stillness");
         });
         test("4Hz filter: bounded delay and vibration attenuation",()->{
@@ -144,5 +144,6 @@ public final class CoreTests {
         CalibrationTests.main(args);
         WearCalibrationTests.main(args);
         RecoveryCalibrationTests.main(args);
+        DeadlineCalibrationTests.main(args);
     }
 }

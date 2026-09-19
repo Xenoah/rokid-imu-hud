@@ -26,6 +26,7 @@ final class SensorController implements SensorEventListener {
     private long started,lastPose,lastAccel,lastGyro,recenterAt,unreliableSince,lastCalibrationLog;
     private boolean running,forceFusion,sensorFault;
     private int mode=1;
+    private Snapshot.CalibrationQuality loggedQuality=Snapshot.CalibrationQuality.PENDING;
     SensorController(Context context,Exchange exchange,boolean forceFusion) {
         manager=(SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
         this.exchange=exchange;this.forceFusion=forceFusion;
@@ -35,6 +36,7 @@ final class SensorController implements SensorEventListener {
         if(running)return;running=true;started=SystemClock.elapsedRealtimeNanos();
         lastPose=0;lastAccel=0;lastGyro=0;recenterAt=0;unreliableSince=0;lastCalibrationLog=0;sensorFault=false;
         engine=new HudEngine(exchange,started);engine.setMode(mode);
+        loggedQuality=Snapshot.CalibrationQuality.PENDING;
         Diagnostics.sensors(manager);
         accSensor=manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         gyroSensor=manager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
@@ -74,7 +76,12 @@ final class SensorController implements SensorEventListener {
         boolean missing=now-started>3_000_000_000L&&(now-lastAccel>2_000_000_000L||now-lastGyro>2_000_000_000L);
         if(missing&&!sensorFault){sensorFault=true;engine.error(now);Log.e(Diagnostics.TAG,"IMU stream stopped");}
         else if(!missing&&sensorFault){sensorFault=false;engine.requestRecenter(now);Log.i(Diagnostics.TAG,"IMU recovered; recalibration required");}
+        engine.tick(now);
         exchange.read(diagnostic);
+        if(diagnostic.calibrationQuality!=loggedQuality){
+            loggedQuality=diagnostic.calibrationQuality;
+            Log.i(Diagnostics.TAG,"calibration quality="+loggedQuality+" elapsedS="+diagnostic.calibrationElapsedSec);
+        }
         if((diagnostic.status==Snapshot.Status.CALIBRATING||diagnostic.status==Snapshot.Status.WAIT_STILL)
             &&now-lastCalibrationLog>=3_000_000_000L){
             lastCalibrationLog=now;
@@ -84,7 +91,8 @@ final class SensorController implements SensorEventListener {
                 +" gyroNorm="+Math.sqrt(diagnostic.gx*diagnostic.gx+diagnostic.gy*diagnostic.gy+diagnostic.gz*diagnostic.gz)
                 +" accStd="+diagnostic.calibrationAccStd+" gyroStd="+diagnostic.calibrationGyroStd
                 +" gyroMeanRadS="+diagnostic.calibrationGyroMean+" poseRangeDeg="+diagnostic.calibrationPoseRange
-                +" rawTiltRangeDeg="+diagnostic.calibrationTiltRange);
+                +" rawTiltRangeDeg="+diagnostic.calibrationTiltRange+" elapsedS="+diagnostic.calibrationElapsedSec
+                +" relaxed="+diagnostic.calibrationRelaxed);
         }
         handler.postDelayed(this,500);
     }};
@@ -93,7 +101,7 @@ final class SensorController implements SensorEventListener {
     void recenter(){handler.post(()->{
         long now=SystemClock.elapsedRealtimeNanos();
         if(!running||engine==null||now-recenterAt<750_000_000L)return;
-        recenterAt=now;engine.requestRecenter(now);Log.i(Diagnostics.TAG,"RECENTER requested; hold still for 1 second");
+        recenterAt=now;engine.requestRecenter(now);Log.i(Diagnostics.TAG,"RECENTER requested; normal 1s, relax 10s, approximate start 15s");
     });}
     void nextMode(){handler.post(()->{mode=mode%3+1;if(engine!=null)engine.setMode(mode);});}
     @Override public void onSensorChanged(SensorEvent event){

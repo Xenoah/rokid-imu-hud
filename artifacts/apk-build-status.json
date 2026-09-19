@@ -1,7 +1,7 @@
 {
   "status": "SIGNED_AND_VERIFIED",
   "applicationId": "dev.xenoah.rokidhud",
-  "versionName": "0.1.4-preview",
+  "versionName": "0.1.5",
   "minSdk": 31,
   "targetSdk": 35,
   "physical_device_test": "NOT_RUN",
@@ -12,7 +12,7 @@
     "/workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/lib/d8.jar": "43d80449b448c7ec428fdadd10b967c0452545de9f7f9965361816dcf5022d30",
     "/workspace/scratch/1fdb946f1b41/android-toolchain/build-tools/lib/apksigner.jar": "9469c60e5e40fc5c44a2f2338509cb6600cdf065e9b50f9fa3ca6c5be5bae6a9"
   },
-  "apk": "/workspace/scratch/1fdb946f1b41/rokid-hud/app/build/outputs/apk/debug/app-debug.apk",
-  "apk_sha256": "9833913816080e82404870b1d53e7387aec19a0d543e6d46dc35cb977a8f4f61",
+  "apk": "/workspace/scratch/1fdb946f1b41/release-history/0.1.5/app/build/outputs/apk/debug/app-debug.apk",
+  "apk_sha256": "8386e7300d7f301cbbc9d083773c9d7a39c89a6cbb5886002a7e4dc9715800c1",
   "apk_bytes": 45528
 }
