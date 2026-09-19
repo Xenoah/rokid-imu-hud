@@ -32,6 +32,11 @@ public final class HudRenderer {
                 c.text("A",55,316,13,190);number(c,s.accHz,0,75,316,15,false);
                 c.text("G",140,316,13,190);number(c,s.gyroHz,0,160,316,15,false);
                 c.text("HZ",210,316,13,190);c.text(s.nativePose?"OS QUAT":"IMU FUSION",281,316,13,190);
+                c.text("POSE",55,339,13,190);
+                if(s.nativePose)number(c,s.calibrationPoseRange,1,104,339,15,false);
+                else c.text("--",104,339,15,190);
+                c.text("DEG",151,339,13,190);c.text("MEAN",225,339,13,190);
+                number(c,Math.toDegrees(s.calibrationGyroMean),2,283,339,15,false);c.text("D/S",354,339,13,190);
             }
         } else if(!fresh) {
             c.text("IMU STALE",155,184,25,255);
@@ -59,6 +64,8 @@ public final class HudRenderer {
             case WAIT_GYRO:return "WAITING FOR GYRO";
             case POSE_DELAY:return "WAITING FOR ATTITUDE";
             case GYRO_MOVING:return "LAST: ROTATION DETECTED";
+            case ATTITUDE_MOVING:return "LAST: ATTITUDE CHANGED";
+            case GYRO_BIAS:return "GYRO OFFSET TOO HIGH";
             case ACCEL_MOVING:return "LAST: MOTION / VIBRATION";
             case ACCEL_SCALE:return "CHECK ACCEL SIGNAL";
             case POSE_MISMATCH:return "SWITCHING TO IMU FUSION";

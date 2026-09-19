@@ -4,12 +4,12 @@ package dev.xenoah.hud.core;
 public final class Snapshot {
     public enum Status { CALIBRATING, READY, LIVE, RECENTERED, WAIT_STILL, SENSOR_ERROR }
     public enum CalibrationReason { COLLECTING, WAIT_GYRO, POSE_DELAY, GYRO_MOVING,
-        ACCEL_MOVING, ACCEL_SCALE, POSE_MISMATCH, ACCEL_BIAS, COMPLETE }
+        ACCEL_MOVING, ACCEL_SCALE, POSE_MISMATCH, ACCEL_BIAS, COMPLETE, ATTITUDE_MOVING, GYRO_BIAS }
     public long timeNs,accTimeNs,gyroTimeNs,attTimeNs;
     public double pitch,roll,lat,longitudinal,peak,rawLat,rawLong;
     public double accHz,gyroHz,attHz,progress;
     public double ax,ay,az,gx,gy,gz,abx,aby,abz,gbx,gby,gbz;
-    public double calibrationAccStd,calibrationGyroStd;
+    public double calibrationAccStd,calibrationGyroStd,calibrationPoseRange,calibrationGyroMean;
     public CalibrationReason calibrationReason=CalibrationReason.COLLECTING;
     public boolean nativeRejected;
     public boolean nativePose,gravityCorrection,valid;
@@ -23,6 +23,7 @@ public final class Snapshot {
         ax=s.ax;ay=s.ay;az=s.az;gx=s.gx;gy=s.gy;gz=s.gz;
         abx=s.abx;aby=s.aby;abz=s.abz;gbx=s.gbx;gby=s.gby;gbz=s.gbz;
         calibrationAccStd=s.calibrationAccStd;calibrationGyroStd=s.calibrationGyroStd;
+        calibrationPoseRange=s.calibrationPoseRange;calibrationGyroMean=s.calibrationGyroMean;
         calibrationReason=s.calibrationReason;nativeRejected=s.nativeRejected;
         valid=s.valid;mode=s.mode;status=s.status;
     }

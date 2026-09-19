@@ -2,7 +2,7 @@
 >
 > **Unofficial and unaffiliated: This is an independent community project. It is not affiliated with, endorsed by, or sponsored by Rokid. The Rokid name is used only to identify compatible hardware.**
 
-# IMU HUD for Rokid Glasses — 0.1.2-preview
+# IMU HUD for Rokid Glasses — 0.1.3-preview
 
 [日本語](#概要--overview) | [English documentation](README.en.md) | [Releases](https://github.com/Xenoah/rokid-imu-hud/releases)
 
@@ -12,9 +12,9 @@ Rokid Glasses本体で動作する非公式の水平儀＋2軸Gメーター。�
 
 An unofficial standalone artificial horizon and two-axis G meter for Rokid Glasses. IMU processing, attitude estimation and HUD rendering run entirely on the glasses, without a phone, Bluetooth link or server.
 
-**静止判定と校正診断を改善 / Improve stillness detection and calibration diagnostics**
+**装着中の頭の揺れを考慮 / Account for head movement during calibration**
 
-[APK・ソースのダウンロード / Download APK and source](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.2-preview)
+[APK・ソースのダウンロード / Download APK and source](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.3-preview)
 
 > 履歴保存用プレリリース / Historical prerelease. 最新版は [Releases](https://github.com/Xenoah/rokid-imu-hud/releases/latest) を確認してください。
 
@@ -33,11 +33,13 @@ The glasses image records approximately 198Hz input and the old calibration wait
 
 Rokid Glasses（Snapdragon AR1 / YodaOS-Sprite）本体で動作する、水平儀＋2軸GメーターのAndroidアプリ。Java 17で実装しています。通常動作時のスマートフォン、Bluetooth、外部センサー、ネット接続は不要です。
 
+**0.1.3：グラス装着中の校正判定を修正。** 実機写真では加速度・ジャイロ各約198Hzの受信と `LAST: ROTATION DETECTED` が確認できました。OS姿勢が使える場合は、角速度の大きさだけでなく校正窓全体の姿勢変化も確認します。OS姿勢から求めた回転分を引いてジャイロバイアスを推定し、小さな頭の揺れをそのままゼロ点へ混ぜないよう変更しました。詳細は [docs/calibration-fix-0.1.3.md](docs/calibration-fix-0.1.3.md)。
+
 **0.1.2：静止校正が終わらない問題への修正。** 姿勢センサーの更新間隔と静止中ノイズで校正が繰り返し初期化されるケースを再現し、時間窓の統計による判定へ変更しました。Quaternionが重力と整合しない場合はジャイロ＋加速度融合へ切り替えます。待機理由・加速度・ジャイロ値・取得Hzを画面に表示します。詳細は [docs/calibration-fix-0.1.2.md](docs/calibration-fix-0.1.2.md)。実機ログがないため、報告された個体の原因を確定したものではありません。
 
 **0.1.1の起動修正も含みます。** 0.1.0ではDecorView生成前に `Window.getInsetsController()` を呼び、Android 12の実装でNullPointerExceptionが発生し得ました。画面生成後のView API呼び出しへ変更しています。調査根拠と検証範囲は [docs/startup-fix-0.1.1.md](docs/startup-fix-0.1.1.md) を参照してください。
 
-**状態：署名済みデバッグAPKを生成済み。Androidコードのコンパイル、DEX変換、署名・整列検証、11項目のAPK内部検査、24項目の模擬IMU試験に合格しました。** `dist/RokidHUD-0.1.2-debug.apk` を同梱しています。Rokid実機・Androidエミュレーターでの起動試験は未実施です。実機60fps、200Hz取得、ボタン配送、軸の符号は未確認です。
+**状態：署名済みデバッグAPKを生成済み。Androidコードのコンパイル、DEX変換、署名・整列検証、11項目のAPK内部検査、32項目の模擬IMU試験に合格しました。** `dist/RokidHUD-0.1.3-debug.apk` を同梱しています。0.1.2はユーザー提供写真でRokid実機の起動・描画・約198HzのIMU受信を確認しましたが、校正で待機していました。**修正版0.1.3の実機・エミュレーター試験は未実施です。** 実機60fps、継続的な取得レート、ボタン配送、軸の符号は未確認です。
 
 今回は利用できるAOSP Androidビルドツールを直接実行し、APKを生成しました。Gradleのダウンロード制限は残っているため、Gradle経由のビルド・Android lintは未実施です。直接ビルドの再現方法と検証範囲は [docs/apk-debug-report.md](docs/apk-debug-report.md) を参照してください。
 
@@ -104,7 +106,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n dev.xenoah.rokidhud/dev.xenoah.hud.MainActivity
 ```
 
-同梱APKを使う場合のパスは `dist/RokidHUD-0.1.2-debug.apk` です。配布済み0.1.0／0.1.1と同一署名なので `adb install -r` で上書きできます。署名の異なる別ビルドがある場合、`INSTALL_FAILED_UPDATE_INCOMPATIBLE` になります。自動アンインストールは行いません。必要なログを保存してから旧版を削除すると、そのアプリの保存データも消去されます。
+同梱APKを使う場合のパスは `dist/RokidHUD-0.1.3-debug.apk` です。配布済み0.1.0／0.1.1／0.1.2と同一署名なので `adb install -r` で上書きできます。署名の異なる別ビルドがある場合、`INSTALL_FAILED_UPDATE_INCOMPATIBLE` になります。自動アンインストールは行いません。必要なログを保存してから旧版を削除すると、そのアプリの保存データも消去されます。
 
 または `tools/install.ps1`。複数のAndroid機器が見える場合は `-Serial 実機シリアル` を付けます。ADBが `unauthorized` なら正規の認証手順を完了してください。
 
@@ -125,9 +127,9 @@ RESETは前面・装着中のみ受け付け、重複イベントを750msで抑�
 
 起動／RESET後に `CALIBRATING / KEEP HEAD STILL` を表示し、約1秒の連続した静止を待ちます。加速度・ジャイロを別々に集計し、最低各20サンプル、ジャイロ平均・分散、加速度分散・大きさ、姿勢変化を検査します。静止中の単発ノイズで毎回やり直す方式を廃止しました。校正時は最新ジャイロ／OS姿勢の150ms鮮度を確認し、ライブG計算用の30ms時刻差を校正には適用しません。
 
-15秒で未完了なら `CALIBRATION WAIT` を表示し、直近の待機理由・ACC（重力を含む大きさ、静止時約1G）・GYRO（度/秒）・A/Gの実効Hzを併記します。`LAST:` は直近に静止窓を取り直した理由で、現在も動いていると断定する表示ではありません。センサー欠落・不正な加速度スケール・持続する運動を無条件で通過させるタイムアウトはありません。
+15秒で未完了なら `CALIBRATION WAIT` を表示し、直近の待機理由・ACC（重力を含む大きさ、静止時約1G）・GYRO（度/秒）・A/Gの実効Hzを併記します。`LAST:` は直近に静止窓を取り直した理由で、現在も動いていると断定する表示ではありません。0.1.3では `POSE`（窓の開始姿勢からの最大角度差）と `MEAN`（生ジャイロの平均ベクトルの大きさ、度/秒）も表示します。POSEはOS姿勢がない場合 `--` です。センサー欠落・不正な加速度スケール・持続する大きな運動を無条件で通過させるタイムアウトはありません。
 
-静止窓でジャイロ平均を残留バイアスとして取得。OS Quaternion使用時は平均加速度と予測重力との差を加速度バイアスとして取得します。自前融合時は、単一静止姿勢では傾斜誤差と横方向バイアスを分離できないため、重力方向の残差のみ推定します。これは工場校正・6面校正の代替ではありません。
+OS姿勢がある場合は、窓内すべての姿勢サンプルについて最初からの角度差が2°以内か確認し、ジャイロ平均からOS姿勢で観測した平均角速度を引いて残留バイアスを推定します。推定バイアスの上限は0.10rad/sです。自前融合だけの場合は従来の厳しい静止条件を維持し、ジャイロ平均を残留バイアスとして取得します。OS Quaternion使用時は平均加速度と予測重力との差を加速度バイアスとして取得します。自前融合時は、単一静止姿勢では傾斜誤差と横方向バイアスを分離できないため、重力方向の残差のみ推定します。これは工場校正・6面校正の代替ではありません。
 
 完了時の姿勢をGメーターの基準Quaternionとして保存し、Pitch/Roll基準、LPF、Peakを初期化。起動は `READY`、以降は `RECENTERED` を1秒表示します。**RESETは約1秒の静止後に成立**する操作です。持続加速中はゼロ点が汚染され得るので、静止状態で実施してください。
 
@@ -151,14 +153,14 @@ adb logcat -v threadtime RokidHUD:I "*:S"
 .\tools\collect-logs.ps1
 ```
 
-CSVはアプリのprivate領域 `files/hud-debug.csv`。10Hzで最大36,000行（約1時間）、次のdebug起動で上書き。0.1.2では `cal_reason`、`cal_acc_std`、`cal_gyro_std`、`native_rejected` を追加しました。GPS・音声・カメラ・ネット送信はありません。`run-as` によるCSV取得にはdebug APKが必要です。描画時間はCPUでの描画・post所要時間であり、光子が目に届くまでのmotion-to-display latencyの実測ではありません。
+CSVはアプリのprivate領域 `files/hud-debug.csv`。10Hzで最大36,000行（約1時間）、次のdebug起動で上書き。校正理由・標準偏差・OS姿勢棄却に加え、0.1.3では `cal_pose_range_deg`、`cal_gyro_mean_rad_s` も記録します。GPS・音声・カメラ・ネット送信はありません。`run-as` によるCSV取得にはdebug APKが必要です。描画時間はCPUでの描画・post所要時間であり、光子が目に届くまでのmotion-to-display latencyの実測ではありません。
 
 自前融合の実機確認：起動時に `--ez force_fusion true` を追加してください。
 
 実機へ転送し、起動・プロセス生存・校正完了・アプリのログを15秒間確認するスクリプトも同梱しています。
 
 ```powershell
-python .\tools\debug-device.py --apk .\dist\RokidHUD-0.1.2-debug.apk
+python .\tools\debug-device.py --apk .\dist\RokidHUD-0.1.3-debug.apk
 # 複数端末がある場合は --serial 実機シリアル を追加
 ```
 
@@ -188,7 +190,7 @@ JDK 17のみで演算部の回帰試験を実行できます。Linuxは `tools/t
 | パス | 内容 |
 | --- | --- |
 | `app/` | Android Activity、公式入力、SensorManager、SurfaceView、ログ |
-| `core/` | Quaternion、融合、校正、G演算、共通描画、24項目の試験 |
+| `core/` | Quaternion、融合、校正、G演算、共通描画、32項目の試験 |
 | `tools/` | ビルド、転送、ログ収集、JDKのみの試験、プレビュー生成 |
 | `docs/` | 公式資料調査、数式、検証記録、実機チェック表 |
 | `artifacts/` | 模擬試験結果と共通描画コードによるプレビュー |

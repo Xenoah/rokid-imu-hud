@@ -2,7 +2,7 @@
 
 更新日：2026-09-19 UTC。
 
-成果物は `dist/RokidHUD-0.1.2-debug.apk`。アプリID `dev.xenoah.rokidhud`、versionCode 3、versionName `0.1.2-preview`、minSdk 31、targetSdk 35。Android 12以降向けの、デバッグ署名付き・CPU ABI非依存のAPKです。校正の修正は [calibration-fix-0.1.2.md](calibration-fix-0.1.2.md)、起動不具合の修正は [startup-fix-0.1.1.md](startup-fix-0.1.1.md) に記録しています。
+成果物は `dist/RokidHUD-0.1.3-debug.apk`。アプリID `dev.xenoah.rokidhud`、versionCode 4、versionName `0.1.3-preview`、minSdk 31、targetSdk 35。Android 12以降向けの、デバッグ署名付き・CPU ABI非依存のAPKです。校正の修正は [calibration-fix-0.1.3.md](calibration-fix-0.1.3.md)、起動不具合の修正は [startup-fix-0.1.1.md](startup-fix-0.1.1.md) に記録しています。
 
 ## ビルド
 
@@ -36,10 +36,10 @@ python3 tools/build-apk.py --android-jar /path/to/android.jar --tools-dir /path/
 | 署名後APKの4バイト整列 | 合格 |
 | Manifest・DEXの構造検査 | 11項目合格 |
 | 起動Activityと実装クラスの一致 | `dev.xenoah.hud.MainActivity` を確認 |
-| DEX内容 | 39クラス、386メソッド。センサー・融合・描画・演算の実装を確認 |
+| DEX内容 | 40クラス、391メソッド。センサー・融合・描画・演算の実装を確認 |
 | 不要クラスの混入 | Androidスタブ、デスクトッププレビュー、テストクラスなし |
 | 権限 | uses-permission宣言なし。通信・Bluetooth権限なし |
-| 模擬IMU回帰試験 | 24項目合格 |
+| 模擬IMU回帰試験 | 32項目合格 |
 
 1時間相当の模擬静止試験（200Hz、720,000サンプル）では、最大傾斜誤差0.008518°、最大水平合成G 0.000837 Gでした。これは固定バイアス＋ホワイトノイズという試験条件での**計算結果**であり、実機性能の測定値ではありません。
 
@@ -47,12 +47,12 @@ python3 tools/build-apk.py --android-jar /path/to/android.jar --tools-dir /path/
 
 ## 残る検証
 
-この環境には接続されたRokid実機もAndroidエミュレーターもありません。APKをAndroid上で起動したという確認は行っていません。Android lintも未実施です。物理IMUの種別・軸・実効Hz、ディスプレイの見え方、公式タッチイベントの配送、実機60fps、消費電力、熱、長時間ドリフトは実機で確認が必要です。
+この環境には接続されたRokid実機もAndroidエミュレーターもありません。修正版0.1.3をAndroid上で起動したという確認は行っていません。旧0.1.2はユーザー提供写真でRokid上の起動・HUD描画・約198Hzのセンサー受信を確認しましたが、校正が待機していました。Android lintも未実施です。物理IMUの種別・軸・実効Hz、ディスプレイの見え方、公式タッチイベントの配送、実機60fps、消費電力、熱、長時間ドリフトは実機で確認が必要です。
 
 `tools/debug-device.py` は、ADB接続した実機へのインストール、デバッグ起動、15秒間のプロセス監視、校正後の有効CSV行の確認、Logcat採取をまとめます。ボタンイベントを注入して物理操作の代わりにする処理はありません。
 
 ```sh
-python3 tools/debug-device.py --apk dist/RokidHUD-0.1.2-debug.apk
+python3 tools/debug-device.py --apk dist/RokidHUD-0.1.3-debug.apk
 ```
 
 具体的な動作確認項目は [device-acceptance.md](device-acceptance.md)。署名が異なる旧APKをスクリプトが勝手に削除することはありません。今回のデバッグ署名鍵はソースZIPに含めていないため、別のPCでビルドしたAPKへ更新するときは署名の一致を確認してください。

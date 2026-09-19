@@ -82,7 +82,8 @@ final class SensorController implements SensorEventListener {
                 +" accHz="+diagnostic.accHz+" gyroHz="+diagnostic.gyroHz+" poseHz="+diagnostic.attHz
                 +" accNorm="+Math.sqrt(diagnostic.ax*diagnostic.ax+diagnostic.ay*diagnostic.ay+diagnostic.az*diagnostic.az)
                 +" gyroNorm="+Math.sqrt(diagnostic.gx*diagnostic.gx+diagnostic.gy*diagnostic.gy+diagnostic.gz*diagnostic.gz)
-                +" accStd="+diagnostic.calibrationAccStd+" gyroStd="+diagnostic.calibrationGyroStd);
+                +" accStd="+diagnostic.calibrationAccStd+" gyroStd="+diagnostic.calibrationGyroStd
+                +" gyroMeanRadS="+diagnostic.calibrationGyroMean+" poseRangeDeg="+diagnostic.calibrationPoseRange);
         }
         handler.postDelayed(this,500);
     }};

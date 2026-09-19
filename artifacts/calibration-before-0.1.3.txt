@@ -1,0 +1,12 @@
+0.1.2 engine with 0.1.3 wearable regression tests (synthetic inputs).
+FAIL	Stable native pose with 3.69deg/s gyro offset can calibrate: screenshot-scale offset still blocks READY
+FAIL	Sub-degree head sway above the old gyro threshold can calibrate: small worn-head motion blocked at poseEvery=1
+FAIL	Small slow real rotation is subtracted from the gyro bias estimate: actual angular velocity is not bias: got=0.01790972830336861 expected=0.004
+PASS	Real sustained yaw at 3.69deg/s is not a stationary gyro offset
+PASS	Large out-and-back motion cannot hide behind equal endpoint poses
+PASS	Quaternion sign flips do not look like head motion
+PASS	Fallback without native attitude keeps conservative rotation rejection
+FAIL	A validated gyro offset survives native-to-fusion handover: native calibration first
+WEAR CALIBRATION RESULT	4 passed; 4 failed (synthetic only)
+Exception in thread "main" java.lang.AssertionError: 4 wearable calibration regressions failed
+	at dev.xenoah.hud.core.WearCalibrationTests.main(WearCalibrationTests.java:93)

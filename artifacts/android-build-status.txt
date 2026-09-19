@@ -1,16 +1,17 @@
 UPDATED 2026-09-19 UTC
-APK: 0.1.2 SIGNED_AND_VERIFIED
-Calibration: independent time-window statistics, bounded native-pose gyro extrapolation, rejection diagnostics
-Startup fix from 0.1.1: retained
-Same signing certificate as 0.1.0 / 0.1.1: CONFIRMED
+APK: 0.1.3 SIGNED_AND_VERIFIED
+Calibration: all-sample OS attitude excursion check, motion-compensated gyro-bias estimate, bias-preserving fallback handover
+Previous fixes: sparse native attitude, stationary noise, startup ordering retained
+Same signing certificate as 0.1.0 / 0.1.1 / 0.1.2: CONFIRMED
 Build route: tools/build-apk.py (direct Android SDK tools)
 Android Java compilation: PASS (API 36 public stubs, target 35, min 31)
 DEX generation: PASS
 APK v3 signature and zip alignment: PASS
 APK static inspection: 11 checks PASS
-Core synthetic tests: 24 PASS (16 existing, 8 calibration regressions)
-Production CSV formatter: PASS (32 columns)
-Fake-ADB failure capture tests: 3 PASS
+Core synthetic tests: 32 PASS (24 existing, 8 wearable calibration cases)
+Production CSV formatter: PASS (34 columns)
+Fake-ADB failure capture: 3 prior tests PASS (helper unchanged)
+User screenshot of 0.1.2: HUD rendered, ACC/GYRO approximately 198Hz, calibration waiting
 Gradle / Android lint: NOT RUN (Gradle download unavailable)
-Android runtime / Rokid physical device: NOT RUN (no runtime or device attached)
-Details: docs/apk-debug-report.md and docs/calibration-fix-0.1.2.md
+0.1.3 Android runtime / Rokid physical device: NOT RUN (no runtime or device attached)
+Details: docs/apk-debug-report.md and docs/calibration-fix-0.1.3.md

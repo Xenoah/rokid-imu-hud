@@ -21,6 +21,10 @@ public final class Config {
     // Window statistics, not a limit applied to every individual noisy sample.
     public static final double STILL_GYRO_RAD_S = 0.045;
     public static final double STILL_GYRO_STD = 0.025;
+    // An OS pose window bounds real movement; raw gyro magnitude may include a residual bias.
+    public static final double NATIVE_CALIBRATION_GYRO_STD = 0.075;
+    public static final double MAX_NATIVE_GYRO_BIAS_RAD_S = 0.10;
+    public static final int CALIBRATION_MIN_POSE_SAMPLES = 5;
     public static final double STILL_ACCEL_STD = 0.12;
     public static final double CALIBRATION_MAX_GYRO_RAD_S = 0.35;
     public static final double CALIBRATION_ACCEL_NORM_ERROR = 0.6;

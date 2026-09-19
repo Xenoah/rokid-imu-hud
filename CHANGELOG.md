@@ -1,5 +1,11 @@
 # Changelog / 変更履歴
 
+## [v0.1.3-preview](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.3-preview)
+
+OS姿勢の変化も静止判定に使用し、OS姿勢から求めた回転分を差し引いてジャイロバイアスを推定します。
+
+Uses OS attitude changes alongside angular velocity for calibration, subtracting estimated real rotation when estimating gyro bias.
+
 ## [v0.1.2-preview](https://github.com/Xenoah/rokid-imu-hud/releases/tag/v0.1.2-preview)
 
 時間窓の統計による静止判定、低頻度のOS姿勢への対応、重力と整合しない姿勢の棄却を追加。待機理由、ACC、GYRO、取得Hzを表示します。

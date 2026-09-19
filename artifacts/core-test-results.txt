@@ -25,3 +25,12 @@ PASS	A stopped native source can fall back and finish calibration
 PASS	Missing gyro and wrong accelerometer scale cannot become READY
 PASS	Sustained vibration is rejected and calibration recovers after it stops
 CALIBRATION RESULT	8 passed; 0 failed (synthetic only)
+PASS	Stable native pose with 3.69deg/s gyro offset can calibrate
+PASS	Sub-degree head sway above the old gyro threshold can calibrate
+PASS	Small slow real rotation is subtracted from the gyro bias estimate
+PASS	Real sustained yaw at 3.69deg/s is not a stationary gyro offset
+PASS	Large out-and-back motion cannot hide behind equal endpoint poses
+PASS	Quaternion sign flips do not look like head motion
+PASS	Fallback without native attitude keeps conservative rotation rejection
+PASS	A validated gyro offset survives native-to-fusion handover
+WEAR CALIBRATION RESULT	8 passed; 0 failed (synthetic only)

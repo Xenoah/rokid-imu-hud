@@ -1,10 +1,10 @@
 {
-  "tag": "v0.1.2-preview",
-  "title": "0.1.2-preview — 静止判定と校正診断を改善 / Improve stillness detection and calibration diagnostics",
+  "tag": "v0.1.3-preview",
+  "title": "0.1.3-preview — 装着中の頭の揺れを考慮 / Account for head movement during calibration",
   "prerelease": true,
-  "notes": "docs/releases/v0.1.2-preview.md",
-  "apk": "dist/RokidHUD-0.1.2-debug.apk",
-  "apk_sha256": "8283fd744c55dae56187b76badccf0f0d2632691b707c535040f3e34ddf390bd",
+  "notes": "docs/releases/v0.1.3-preview.md",
+  "apk": "dist/RokidHUD-0.1.3-debug.apk",
+  "apk_sha256": "d2e19c42e3529f76091f2d0ee0eaad2a33e839bc994a85c78e24cdb81d6bc701",
   "images": [
     "artifacts/hud-combined-480x400.png",
     "artifacts/hud-calibration-wait-480x400.png",

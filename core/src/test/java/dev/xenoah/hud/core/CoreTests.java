@@ -142,5 +142,6 @@ public final class CoreTests {
         });
         System.out.println("RESULT\t"+passed+" tests passed (synthetic data; no hardware attached)");
         CalibrationTests.main(args);
+        WearCalibrationTests.main(args);
     }
 }
