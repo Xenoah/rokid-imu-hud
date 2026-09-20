@@ -21,12 +21,14 @@ An unofficial standalone artificial horizon and two-axis G meter for Rokid Glass
 
 ## 実機スクリーンショット / Device screenshots
 
-**0.1.2の調査時にユーザーから提供された画像です。最新版の実機動作確認を示すものではありません。**
+**0.1.5の調査時にユーザーから提供された画像です。最新版の実機動作確認を示すものではありません。**
 User-provided images from the 0.1.2 investigation; these do not demonstrate hardware validation of the latest version.
 
 | スマートフォン / Phone HUD | Rokid Glasses / Calibration issue |
 | --- | --- |
-| <img src="docs/screenshots/phone-hud-0.1.2.png" width="220" alt="Phone HUD screenshot reported with 0.1.2"> | <img src="docs/screenshots/glasses-calibration-0.1.2.jpg" width="300" alt="Rokid Glasses calibration wait in 0.1.2"> |
+| <img width="480" height="400" alt="hud-combined-480x400" src="https://github.com/user-attachments/assets/daf75d29-42fa-4514-a386-e4f1ecdf5cfb" />
+ | <img width="3024" height="4032" alt="rokid-imu-hid_v0_1_5_test" src="https://github.com/user-attachments/assets/ea454254-9054-42c6-adae-3041c3d8936c" />
+ |
 
 グラス画像は約198Hzの入力と旧版の校正待機を記録したものです。下の480×400画像は本番描画コードによるデスクトッププレビューです。
 The glasses image records approximately 198Hz input and the old calibration wait. The 480×400 image below is a desktop render made with the production HUD drawing code.
